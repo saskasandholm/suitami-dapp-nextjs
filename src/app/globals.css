@@ -76,3 +76,36 @@
     @apply bg-black/40 backdrop-blur-md border border-white/5 rounded-xl;
   }
 }
+
+/* Tremor overrides */
+.tremor-Card-root {
+  @apply bg-black/20 backdrop-blur-lg border border-white/10 !important;
+}
+
+.dark .tremor-Card-root {
+  @apply bg-black/20 backdrop-blur-lg border border-white/10 !important;
+}
+
+.tremor-TabList-root {
+  @apply border-white/10 !important;
+}
+
+.tremor-Tab-root {
+  @apply text-white/70 hover:text-accent !important;
+}
+
+.tremor-Tab-root[data-headlessui-state="selected"] {
+  @apply text-accent border-accent !important;
+}
+
+.tremor-AreaChart-root, .tremor-BarChart-root {
+  @apply text-white/70 !important;
+}
+
+.tremor-Legend-root {
+  @apply text-white/70 !important;
+}
+
+.tremor-Title-root, .tremor-Text-root {
+  @apply text-white/90 !important;
+}

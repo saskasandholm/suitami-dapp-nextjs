@@ -5,7 +5,7 @@ interface LayoutProps {
   children: ReactNode;
 }
 
-export const Layout = ({ children }: LayoutProps): JSX.Element => {
+const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#011829] via-[#030f1c] to-black">
       <Navbar />

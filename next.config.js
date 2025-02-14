@@ -1,7 +1,10 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  /* config options here */
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  transpilePackages: ["@tremor/react"],
+  images: {
+    domains: ['github.com'], // Add any other domains you need for images
+  },
 };
 
-export default nextConfig;
+module.exports = nextConfig;

@@ -69,6 +69,16 @@ Please read our contributing guidelines before submitting pull requests.
 
 ## Changelog
 
+### Version 0.11.3 (Latest)
+- Fixed Layout and Styling Issues:
+  - Improved layout structure with proper nesting
+  - Fixed dashboard layout and sidebar behavior
+  - Added proper height classes for full-screen layouts
+  - Updated Tremor component styling for dark mode
+  - Added PostCSS configuration
+  - Fixed CSS linting issues
+  - Enhanced responsive design
+
 ### Version 0.11.2 (Latest)
 - Improved KnowledgeBase Component Architecture:
   - Created shared types for Document, Source, and FAQ interfaces
