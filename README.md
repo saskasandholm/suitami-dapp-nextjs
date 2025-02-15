@@ -18,42 +18,6 @@ Suitami provides an intelligence layer that empowers Web3 communities with auton
 - Headless UI (Accessible Components)
 - Heroicons (Icons)
 
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18.17 or later
-- pnpm
-
-### Installation
-
-```bash
-# Install dependencies
-pnpm install
-
-# Run development server
-pnpm dev
-
-# Build for production
-pnpm build
-
-# Start production server
-pnpm start
-```
-
-## Project Structure
-
-```
-src/
-├── app/              # App router pages
-├── components/       # Reusable components
-│   ├── layout/      # Layout components
-│   ├── ui/          # UI components
-│   └── agents/      # AI agent management components
-├── styles/          # Global styles
-└── types/           # TypeScript types
-```
-
 ## Features
 
 - Modern, responsive UI
@@ -89,6 +53,70 @@ src/
   - Categorized FAQ entries
   - Length validation for questions and answers
   - Easy editing and deletion
+
+### Community Analytics
+
+- Real-time community metrics across platforms (Telegram, Discord, Twitter)
+- Interactive charts with drill-down capabilities
+- Anomaly detection for key metrics
+- Community Health Score
+- Sentiment analysis and trending topics
+- Custom date range analysis
+- Data export functionality
+- Platform-specific insights
+- Accessibility-first design
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18.17 or later
+- pnpm
+- Modern web browser
+
+### Installation
+
+```bash
+# Install dependencies
+pnpm install
+
+# Run development server
+pnpm dev
+
+# Build for production
+pnpm build
+
+# Start production server
+pnpm start
+```
+
+### Environment Variables
+
+Create a `.env.local` file in the root directory:
+
+```
+NEXT_PUBLIC_API_URL=your_api_url
+NEXT_PUBLIC_WALLET_CONNECT_ID=your_wallet_connect_id
+```
+
+## Project Structure
+
+```
+src/
+├── app/              # App router pages
+├── components/       # Reusable components
+│   ├── layout/      # Layout components
+│   ├── ui/          # UI components
+│   └── agents/      # AI agent management components
+├── styles/          # Global styles
+└── types/           # TypeScript types
+```
+
+## Documentation
+
+Detailed documentation for each component can be found in the `docs/` directory:
+
+- [Community Analytics](docs/community-analytics.md)
 
 ## Contributing
 
@@ -284,3 +312,48 @@ Please read our contributing guidelines before submitting pull requests.
 - Improved accessibility with ARIA support and keyboard navigation
 - Added persistent error notifications
 - Enhanced validation rules for structured data
+
+### [0.13.6] - 2024-02-15
+
+- Enhanced Community Analytics Accessibility and Error Handling:
+  - Added comprehensive ARIA labels for all charts
+  - Improved screen reader support with descriptive text
+  - Enhanced loading states and error recovery
+  - Added visual feedback for metric changes
+  - Implemented robust error handling for data loading
+  - Updated documentation with best practices
+  - Added TypeScript improvements for better type safety
+
+### [0.13.5] - 2024-02-15
+
+- Enhanced Community Analytics Features:
+  - Added drill-down capability in member growth charts
+  - Implemented hourly data visualization
+  - Added interactive tooltips and hover states
+  - Integrated CSV data export functionality
+  - Enhanced chart legends and data formatting
+  - Added detailed metric selection for exports
+  - Improved chart interactivity and user feedback
+
+### [0.13.4] - 2024-02-15
+
+- Added Enhanced Community Analytics Features:
+  - Implemented anomaly detection using z-score analysis
+  - Added Community Health Score calculation
+  - Integrated direct links to community platforms
+  - Added custom date range selection
+  - Implemented visual indicators for anomalies
+  - Enhanced interactive charts and visualizations
+  - Improved UI with health score card and metric cards
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- Next.js team for the amazing framework
+- Tremor for beautiful charts
+- Framer Motion for smooth animations
+- Tailwind CSS for styling
+- HeadlessUI for accessible components

@@ -75,10 +75,10 @@ export default function SettingsPage() {
 
   return (
     <div className="max-w-7xl mx-auto">
-      <div className="mb-8 flex justify-between items-center">
+      <div className="page-header">
         <div>
-          <h1 className="text-3xl font-bold text-gradient">Settings</h1>
-          <p className="text-white/70 mt-2">Manage your account settings and preferences</p>
+          <h1 className="page-title">Settings</h1>
+          <p className="page-description">Manage your account settings and preferences</p>
         </div>
         <button
           onClick={handleLogout}

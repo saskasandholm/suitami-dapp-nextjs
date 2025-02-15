@@ -46,7 +46,7 @@ export default function KnowledgeBaseDocumentsPanel({
       <div className="flex justify-between items-center">
         <Title>Documents</Title>
         <label
-          className={`cursor-pointer bg-accent hover:bg-accent/80 text-black px-4 py-2 rounded-lg transition-opacity ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`button-primary cursor-pointer ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
           {isLoading ? (
             <div className="flex items-center space-x-2">
