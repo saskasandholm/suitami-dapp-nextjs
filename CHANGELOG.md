@@ -160,3 +160,24 @@
 - Improved filtering UI with platform-specific icons
 - Enhanced agent card design with status and metrics
 - Added Radix UI icons for better platform representation
+
+## [0.12.3] - 2024-02-15
+
+### Changed
+
+- Updated supported platforms to focus on Telegram, Discord, and Twitter
+- Enhanced agent cards with profile pictures and improved layout
+- Streamlined platform selection in deployment modal
+
+## [0.12.4] - 2024-02-15
+
+### Changed
+
+- Standardized page headers across all dashboard pages:
+  - Consistent title and description styling
+  - Unified spacing and layout
+  - Standardized gradient effects
+- Improved page load animations:
+  - Removed animation from page headers for instant visibility
+  - Maintained content section animations for better UX
+  - Consistent animation timing across all pages
