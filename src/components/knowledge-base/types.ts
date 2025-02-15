@@ -13,14 +13,14 @@ export interface Document extends ItemData {
 
 export interface Source extends ItemData {
   url: string;
-  status: 'processing' | 'indexed' | 'failed';
   addedAt: string;
+  status: 'processing' | 'indexed' | 'failed';
 }
 
 export interface FAQ extends ItemData {
   question: string;
   answer: string;
-  category: string;
+  category: FAQCategory;
 }
 
 export type FormState = Record<string, string>;
@@ -37,4 +37,7 @@ export interface FormField {
 
 export interface FormErrors {
   [key: string]: string | undefined;
-} 
+}
+
+export const FAQ_CATEGORIES = ['General', 'Technical', 'Platform', 'Community'] as const;
+export type FAQCategory = (typeof FAQ_CATEGORIES)[number];

@@ -1,23 +1,22 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
+import ClientLayout from '@/components/layout/ClientLayout';
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: "Suitami - AI Agents for Web3 Communities",
-  description: "Deploy autonomous AI agents to manage and grow your Web3 community",
+  title: 'Suitami - AI Agents for Web3 Communities',
+  description: 'Deploy autonomous AI agents to manage and grow your Web3 community',
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="dark h-full">
-      <body className={`${inter.className} dark h-full bg-gradient-to-b from-[#011829] via-[#030f1c] to-black text-white antialiased`}>
-        {children}
+      <body
+        className={`${inter.className} dark h-full bg-gradient-to-b from-[#011829] via-[#030f1c] to-black text-white antialiased`}
+      >
+        <ClientLayout>{children}</ClientLayout>
       </body>
     </html>
   );

@@ -1,9 +1,10 @@
 'use client';
 
-import { ChangeEvent } from 'react';
-import { Card, Title, Text } from "@tremor/react";
-import { DocumentIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { ChangeEvent, useState } from 'react';
+import { Card, Title, Text } from '@tremor/react';
+import { DocumentIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { Document } from './types';
+import LoadingIndicator from '../ui/LoadingIndicator';
 
 interface KnowledgeBaseDocumentsPanelProps {
   documents: Document[];
@@ -16,10 +17,27 @@ export default function KnowledgeBaseDocumentsPanel({
   onUpload,
   onDelete,
 }: KnowledgeBaseDocumentsPanelProps) {
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      onUpload(e.target.files);
-      e.target.value = ''; // Reset input
+      setIsLoading(true);
+      try {
+        await onUpload(e.target.files);
+      } finally {
+        setIsLoading(false);
+        e.target.value = ''; // Reset input
+      }
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    setDeletingId(id);
+    try {
+      await onDelete(id);
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -27,14 +45,24 @@ export default function KnowledgeBaseDocumentsPanel({
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <Title>Documents</Title>
-        <label className="cursor-pointer bg-accent hover:bg-accent/80 text-black px-4 py-2 rounded-lg">
-          Upload Document
+        <label
+          className={`cursor-pointer bg-accent hover:bg-accent/80 text-black px-4 py-2 rounded-lg transition-opacity ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+        >
+          {isLoading ? (
+            <div className="flex items-center space-x-2">
+              <LoadingIndicator size="sm" />
+              <span>Uploading...</span>
+            </div>
+          ) : (
+            'Upload Document'
+          )}
           <input
             type="file"
             className="hidden"
             onChange={handleFileChange}
             multiple
             accept=".pdf,.doc,.docx,.txt"
+            disabled={isLoading}
           />
         </label>
       </div>
@@ -48,7 +76,7 @@ export default function KnowledgeBaseDocumentsPanel({
         </Card>
       ) : (
         <div className="grid gap-4">
-          {documents.map((doc) => (
+          {documents.map(doc => (
             <Card key={doc.id} className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
@@ -60,19 +88,27 @@ export default function KnowledgeBaseDocumentsPanel({
                 </div>
                 <div className="flex items-center space-x-4">
                   {doc.status === 'processing' && (
-                    <span className="text-sm text-yellow-500">Processing...</span>
+                    <div className="flex items-center space-x-2 text-yellow-500">
+                      <LoadingIndicator size="sm" />
+                      <span className="text-sm">Processing...</span>
+                    </div>
                   )}
                   {doc.status === 'indexed' && (
                     <span className="text-sm text-green-500">Indexed</span>
                   )}
-                  {doc.status === 'failed' && (
-                    <span className="text-sm text-red-500">Failed</span>
-                  )}
+                  {doc.status === 'failed' && <span className="text-sm text-red-500">Failed</span>}
                   <button
-                    onClick={() => onDelete(doc.id)}
-                    className="p-2 hover:bg-white/10 rounded-lg"
+                    onClick={() => handleDelete(doc.id)}
+                    className={`p-2 hover:bg-white/10 rounded-lg transition-opacity ${
+                      deletingId === doc.id ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
+                    disabled={deletingId === doc.id}
                   >
-                    <TrashIcon className="w-5 h-5 text-white/70" />
+                    {deletingId === doc.id ? (
+                      <LoadingIndicator size="sm" />
+                    ) : (
+                      <TrashIcon className="w-5 h-5 text-white/70" />
+                    )}
                   </button>
                 </div>
               </div>
@@ -82,4 +118,4 @@ export default function KnowledgeBaseDocumentsPanel({
       )}
     </div>
   );
-} 
+}

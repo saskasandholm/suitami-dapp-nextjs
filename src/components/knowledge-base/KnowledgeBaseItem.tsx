@@ -1,32 +1,26 @@
 'use client';
 
-import { Text, Badge } from "@tremor/react";
-import { TrashIcon } from "@heroicons/react/24/outline";
+import { Text, Badge } from '@tremor/react';
+import { TrashIcon } from '@heroicons/react/24/outline';
+import { ItemData } from './types';
 
-interface ItemData {
-  id: string;
-  title: string;
-  subtitle: string;
-  [key: string]: any;  // Allow for additional properties
-}
-
-interface KnowledgeBaseItemProps<T extends ItemData> {
+interface KnowledgeBaseItemProps {
   icon: React.ReactNode;
-  itemData: T;
+  itemData: ItemData;
   status?: 'processing' | 'indexed' | 'failed';
   badge?: string;
   onDelete: (id: string) => void;
   className?: string;
 }
 
-export default function KnowledgeBaseItem<T extends ItemData>({
+export default function KnowledgeBaseItem({
   icon,
   itemData,
   status,
   badge,
   onDelete,
   className = '',
-}: KnowledgeBaseItemProps<T>) {
+}: KnowledgeBaseItemProps) {
   return (
     <div className={`glass-card p-4 ${className}`}>
       <div className="flex items-center justify-between">
@@ -44,19 +38,15 @@ export default function KnowledgeBaseItem<T extends ItemData>({
                 status === 'indexed'
                   ? 'bg-green-400/10 text-green-400'
                   : status === 'processing'
-                  ? 'bg-yellow-400/10 text-yellow-400'
-                  : 'bg-red-400/10 text-red-400'
+                    ? 'bg-yellow-400/10 text-yellow-400'
+                    : 'bg-red-400/10 text-red-400'
               }`}
             >
               {status.charAt(0).toUpperCase() + status.slice(1)}
             </Badge>
           )}
-          {badge && (
-            <Badge className="bg-white/5 text-white/70">
-              {badge}
-            </Badge>
-          )}
-          <button 
+          {badge && <Badge className="bg-white/5 text-white/70">{badge}</Badge>}
+          <button
             className="text-red-400 hover:text-red-300"
             onClick={() => onDelete(itemData.id)}
             aria-label={`Delete ${itemData.title}`}
@@ -67,4 +57,4 @@ export default function KnowledgeBaseItem<T extends ItemData>({
       </div>
     </div>
   );
-} 
+}

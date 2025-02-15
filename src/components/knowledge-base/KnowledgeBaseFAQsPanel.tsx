@@ -1,20 +1,18 @@
 'use client';
 
 import { useState } from 'react';
-import { motion, AnimatePresence } from "framer-motion";
-import { QuestionMarkCircleIcon, TrashIcon } from "@heroicons/react/24/outline";
-import { FAQ } from './types';
+import { motion, AnimatePresence } from 'framer-motion';
+import { QuestionMarkCircleIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { FAQ, FAQ_CATEGORIES, FAQCategory } from './types';
 import LoadingIndicator from '../ui/LoadingIndicator';
-import Notification from '../ui/Notification';
-import { Card, Title, Text } from "@tremor/react";
+import { useNotification } from '@/contexts/NotificationContext';
+import { Card, Title, Text } from '@tremor/react';
 
 interface KnowledgeBaseFAQsPanelProps {
   faqs: FAQ[];
-  onAdd: (question: string, answer: string, category: string) => Promise<void>;
+  onAdd: (question: string, answer: string, category: FAQCategory) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
 }
-
-const FAQ_CATEGORIES = ['General', 'Technical', 'Platform', 'Community'];
 
 export default function KnowledgeBaseFAQsPanel({
   faqs,
@@ -22,32 +20,30 @@ export default function KnowledgeBaseFAQsPanel({
   onDelete,
 }: KnowledgeBaseFAQsPanelProps) {
   const [isAdding, setIsAdding] = useState(false);
-  const [isDeleting, setIsDeleting] = useState<string | null>(null);
-  const [notification, setNotification] = useState<{
-    type: 'error' | 'success' | 'info';
-    message: string;
-  } | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const { addNotification } = useNotification();
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState('');
-  const [category, setCategory] = useState('');
+  const [category, setCategory] = useState<FAQCategory | ''>('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (question && answer && category) {
       setIsAdding(true);
       try {
-        await onAdd(question, answer, category);
-        setNotification({
+        await onAdd(question, answer, category as FAQCategory);
+        addNotification({
           type: 'success',
-          message: 'FAQ added successfully'
+          message: 'FAQ added successfully',
         });
         setQuestion('');
         setAnswer('');
         setCategory('');
       } catch (error) {
-        setNotification({
+        addNotification({
           type: 'error',
-          message: error instanceof Error ? error.message : 'Failed to add FAQ'
+          message: error instanceof Error ? error.message : 'Failed to add FAQ',
+          isPersistent: true,
         });
       } finally {
         setIsAdding(false);
@@ -56,20 +52,21 @@ export default function KnowledgeBaseFAQsPanel({
   };
 
   const handleDelete = async (id: string) => {
-    setIsDeleting(id);
+    setDeletingId(id);
     try {
       await onDelete(id);
-      setNotification({
+      addNotification({
         type: 'success',
-        message: 'FAQ deleted successfully'
+        message: 'FAQ deleted successfully',
       });
     } catch (error) {
-      setNotification({
+      addNotification({
         type: 'error',
-        message: error instanceof Error ? error.message : 'Failed to delete FAQ'
+        message: error instanceof Error ? error.message : 'Failed to delete FAQ',
+        isPersistent: true,
       });
     } finally {
-      setIsDeleting(null);
+      setDeletingId(null);
     }
   };
 
@@ -87,10 +84,11 @@ export default function KnowledgeBaseFAQsPanel({
               type="text"
               id="question"
               value={question}
-              onChange={(e) => setQuestion(e.target.value)}
+              onChange={e => setQuestion(e.target.value)}
               className="mt-1 block w-full rounded-md bg-white/5 border border-white/10 px-3 py-2 text-white shadow-sm focus:border-accent focus:ring-accent sm:text-sm"
               placeholder="Enter your question"
               required
+              disabled={isAdding}
             />
           </div>
           <div>
@@ -100,32 +98,49 @@ export default function KnowledgeBaseFAQsPanel({
             <textarea
               id="answer"
               value={answer}
-              onChange={(e) => setAnswer(e.target.value)}
+              onChange={e => setAnswer(e.target.value)}
               className="mt-1 block w-full rounded-md bg-white/5 border border-white/10 px-3 py-2 text-white shadow-sm focus:border-accent focus:ring-accent sm:text-sm"
               placeholder="Enter the answer"
               rows={4}
               required
+              disabled={isAdding}
             />
           </div>
           <div>
             <label htmlFor="category" className="block text-sm font-medium text-white/70">
               Category
             </label>
-            <input
-              type="text"
+            <select
               id="category"
               value={category}
-              onChange={(e) => setCategory(e.target.value)}
+              onChange={e => setCategory(e.target.value as FAQCategory | '')}
               className="mt-1 block w-full rounded-md bg-white/5 border border-white/10 px-3 py-2 text-white shadow-sm focus:border-accent focus:ring-accent sm:text-sm"
-              placeholder="Enter a category"
               required
-            />
+              disabled={isAdding}
+            >
+              <option value="">Select a category</option>
+              {FAQ_CATEGORIES.map(cat => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
           </div>
           <button
             type="submit"
-            className="w-full bg-accent hover:bg-accent/80 text-black px-4 py-2 rounded-lg"
+            className={`w-full bg-accent hover:bg-accent/80 text-black px-4 py-2 rounded-lg transition-opacity ${
+              isAdding ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
+            disabled={isAdding}
           >
-            Add FAQ
+            {isAdding ? (
+              <div className="flex items-center justify-center space-x-2">
+                <LoadingIndicator size="sm" />
+                <span>Adding FAQ...</span>
+              </div>
+            ) : (
+              'Add FAQ'
+            )}
           </button>
         </form>
       </Card>
@@ -139,7 +154,7 @@ export default function KnowledgeBaseFAQsPanel({
         </Card>
       ) : (
         <div className="grid gap-4">
-          {faqs.map((faq) => (
+          {faqs.map(faq => (
             <Card key={faq.id} className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
@@ -152,22 +167,22 @@ export default function KnowledgeBaseFAQsPanel({
                 </div>
                 <button
                   onClick={() => handleDelete(faq.id)}
-                  className="p-2 hover:bg-white/10 rounded-lg"
+                  className={`p-2 hover:bg-white/10 rounded-lg transition-opacity ${
+                    deletingId === faq.id ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                  disabled={deletingId === faq.id}
                 >
-                  <TrashIcon className="w-5 h-5 text-white/70" />
+                  {deletingId === faq.id ? (
+                    <LoadingIndicator size="sm" />
+                  ) : (
+                    <TrashIcon className="w-5 h-5 text-white/70" />
+                  )}
                 </button>
               </div>
             </Card>
           ))}
         </div>
       )}
-
-      <Notification
-        type={notification?.type || 'info'}
-        message={notification?.message || ''}
-        isVisible={!!notification}
-        onClose={() => setNotification(null)}
-      />
     </div>
   );
-} 
+}

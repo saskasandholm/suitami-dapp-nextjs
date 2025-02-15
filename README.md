@@ -62,6 +62,33 @@ src/
 - Community Analytics
 - Agent Performance Monitoring
 - Custom Agent Training Interface
+- Notification System
+  - Notification queueing for multiple messages
+  - Type-based persistence (errors persist, others auto-hide)
+  - Keyboard navigation support
+  - ARIA accessibility compliance
+  - Improved stacking and positioning
+  - Clear error messages with context
+  - Auto-hiding for non-error notifications
+- Validation System
+  - Comprehensive input validation
+  - File size and type checks
+  - URL protocol and format validation
+  - FAQ content length limits
+  - Structured data validation
+  - Real-time validation feedback
+- Document Management
+  - File upload with size and type validation
+  - Progress tracking for document processing
+  - Automatic status updates
+- URL Source Management
+  - URL validation with protocol checks
+  - Processing status tracking
+  - Easy deletion and management
+- FAQ Management
+  - Categorized FAQ entries
+  - Length validation for questions and answers
+  - Easy editing and deletion
 
 ## Contributing
 
@@ -250,3 +277,10 @@ Please read our contributing guidelines before submitting pull requests.
 - Initial project setup
 - Basic project structure
 - Documentation setup
+
+## Recent Updates (v0.11.6)
+
+- Enhanced notification system with queueing and persistence
+- Improved accessibility with ARIA support and keyboard navigation
+- Added persistent error notifications
+- Enhanced validation rules for structured data
