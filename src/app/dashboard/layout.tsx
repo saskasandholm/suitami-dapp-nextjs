@@ -13,8 +13,9 @@ import {
   DocumentIcon,
   BeakerIcon,
 } from '@heroicons/react/24/outline';
-import { ApolloProvider } from '@apollo/client';
-import { client } from '@/lib/apollo-client';
+import { Providers } from '@/components/providers';
+import { usePrivy } from '@privy-io/react-auth';
+import { LoginButton } from '@/components/LoginButton';
 
 const navigation = [
   { name: 'Overview', href: '/dashboard', icon: ChartBarIcon },
@@ -29,9 +30,49 @@ const navigation = [
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const { ready, authenticated, user, login, logout } = usePrivy();
+
+  const handleLogin = () => {
+    if (ready && !authenticated) {
+      login();
+    }
+  };
+
+  const handleLogout = () => {
+    if (ready && authenticated) {
+      logout();
+    }
+  };
+
+  // const renderWalletSection = () => {
+  //   if (!ready) {
+  //     return null;
+  //   }
+
+  //   if (!authenticated) {
+  //     return <LoginButton />;
+  //   }
+
+  //   return (
+  //     <div className="flex items-center">
+  //       <div className="w-8 h-8 rounded-full bg-[#87fafd]/20 flex items-center justify-center">
+  //         <UserGroupIcon className="w-4 h-4 text-accent" />
+  //       </div>
+  //       {isSidebarOpen && (
+  //         <div className="ml-3">
+  //           <p className="text-sm text-white/70">Connected Wallet</p>
+  //           <p className="text-xs text-accent truncate">{user?.wallet?.address}</p>
+  //           <button onClick={handleLogout} className="text-xs text-red-400 hover:text-red-300 mt-1">
+  //             Disconnect
+  //           </button>
+  //         </div>
+  //       )}
+  //     </div>
+  //   );
+  // };
 
   return (
-    <ApolloProvider client={client}>
+    <Providers>
       <div className="min-h-screen">
         <div className="flex min-h-screen bg-dark-gradient">
           {/* Sidebar */}
@@ -95,19 +136,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </nav>
 
               <div className="mt-auto">
-                <div className="glass-card p-4">
-                  <div className="flex items-center">
-                    <div className="w-8 h-8 rounded-full bg-[#87fafd]/20 flex items-center justify-center">
-                      <UserGroupIcon className="w-4 h-4 text-accent" />
-                    </div>
-                    {isSidebarOpen && (
-                      <div className="ml-3">
-                        <p className="text-sm text-white/70">Connected Wallet</p>
-                        <p className="text-xs text-accent truncate">0x1234...5678</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                {/* <div className="glass-card p-4">{renderWalletSection()}</div> */}
+                <LoginButton />
               </div>
             </div>
           </motion.aside>
@@ -120,6 +150,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </main>
         </div>
       </div>
-    </ApolloProvider>
+    </Providers>
   );
 }
