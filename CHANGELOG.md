@@ -1,5 +1,84 @@
 # Changelog
 
+## [0.13.5] - 2024-02-15
+
+### Added
+
+- Enhanced Community Analytics with interactive features:
+  - Drill-down capability in member growth charts
+  - Hourly data visualization for detailed analysis
+  - Interactive tooltips and hover states
+  - CSV data export functionality
+  - Chart legends and improved data formatting
+  - Detailed metric selection for exports
+
+### Changed
+
+- Improved Community Analytics charts:
+  - Added back navigation for drill-down views
+  - Enhanced chart tooltips with detailed information
+  - Updated chart layouts for better data visualization
+  - Added export controls for data analysis
+  - Improved chart interactivity and user feedback
+
+## [0.13.4] - 2024-02-15
+
+### Added
+
+- Enhanced Community Analytics with actionable insights:
+  - Anomaly detection for key metrics using z-score analysis
+  - Community Health Score combining growth, engagement, sentiment, and activity
+  - Direct platform links to Telegram, Discord, and Twitter communities
+  - Custom date range selection for deeper analysis
+  - Visual indicators for anomalies and health status
+  - Interactive charts with hover details
+
+### Changed
+
+- Improved Community Analytics UI:
+  - Added health score card with status indicators
+  - Enhanced metric cards with anomaly detection
+  - Updated time range selector with custom date support
+  - Added platform quick access links
+  - Improved visual feedback for metric changes
+
+## [0.13.1] - 2024-02-15
+
+### Added
+
+- Enhanced documentation for Training Center:
+  - Comprehensive overview of MVP features
+  - Detailed accessibility guidelines
+  - Error handling procedures
+  - Best practices for reviewing actions
+  - Keyboard shortcuts reference
+  - Mobile support documentation
+  - Future enhancement roadmap
+- Improved tooltips and visual feedback:
+  - Screen reader support for all interactive elements
+  - Clear status indicators for actions
+  - Enhanced keyboard navigation cues
+  - Mobile-optimized touch targets
+  - Platform-specific context hints
+
+### Changed
+
+- Updated Training Center documentation structure:
+  - Reorganized sections for better clarity
+  - Added technical details section
+  - Enhanced usage guidelines
+  - Expanded best practices
+  - Improved accessibility documentation
+  - Added mobile-specific considerations
+
+### Fixed
+
+- Documentation consistency issues
+- Missing keyboard shortcut descriptions
+- Unclear error handling procedures
+- Incomplete accessibility guidelines
+- Mobile support documentation gaps
+
 ## [0.11.6] - 2024-02-14
 
 ### Added
@@ -354,3 +433,141 @@
   - Unified animation timings
   - Consistent spacing patterns
   - Enhanced visual feedback
+
+## [0.13.2] - 2024-02-15
+
+### Added
+
+- Enhanced Community Analytics page:
+  - Platform-specific metrics and insights
+  - Time range selectors for all analytics
+  - Hourly activity tracking
+  - Peak hours analysis
+  - Top channels and content performance
+  - User retention metrics
+  - Detailed platform performance tabs
+- New visualization features:
+  - Member growth trends
+  - Platform activity comparisons
+  - Engagement analysis
+  - Real-time metrics dashboard
+- Improved data presentation:
+  - Formatted numbers with proper notation
+  - Percentage-based metrics
+  - Trend indicators
+  - Platform-specific icons
+
+### Changed
+
+- Restructured community analytics layout:
+  - Split metrics by platform
+  - Added tabbed interface for platform details
+  - Enhanced card layouts for better readability
+  - Improved responsive design
+- Updated metrics calculations:
+  - Added aggregate statistics across platforms
+  - Enhanced engagement rate calculations
+  - Improved active user tracking
+- Enhanced TypeScript support:
+  - Added proper type definitions for metrics
+  - Improved type safety for platform data
+  - Better interface organization
+
+## [0.13.3] - 2024-02-15
+
+### Added
+
+- Enhanced Community Analytics with sentiment analysis:
+  - Overall sentiment score and trends
+  - Platform-specific sentiment distribution
+  - Sentiment breakdown (positive, neutral, negative)
+  - Visual sentiment indicators with color coding
+- Trending Topics analysis:
+  - Real-time topic tracking across platforms
+  - Topic sentiment correlation
+  - Mention count tracking
+  - Trend direction indicators
+- Improved engagement metrics:
+  - Normalized engagement rate calculations
+  - Platform-specific engagement benchmarks
+  - Content performance analysis
+  - Top performing content identification
+
+### Changed
+
+- Restructured Community Analytics dashboard:
+  - Added sentiment analysis overview section
+  - Enhanced platform performance cards
+  - Improved trending topics visualization
+  - Updated metrics calculations for better accuracy
+- Enhanced TypeScript support:
+  - Added proper type definitions for platform metrics
+  - Improved type safety for data handling
+  - Better interface organization
+
+## [0.13.4] - 2024-02-15
+
+### Added
+
+- Enhanced Community Analytics with interactive features:
+  - Drill-down capability in member growth charts
+  - Hourly data visualization for detailed analysis
+  - Interactive tooltips and hover states
+  - CSV data export functionality
+  - Chart legends and improved data formatting
+  - Detailed metric selection for exports
+
+### Changed
+
+- Improved Community Analytics charts:
+  - Added back navigation for drill-down views
+  - Enhanced chart tooltips with detailed information
+  - Updated chart layouts for better data visualization
+  - Added export controls for data analysis
+  - Improved chart interactivity and user feedback
+
+## [0.13.6] - 2024-02-15
+
+### Added
+
+- Enhanced accessibility features in Community Analytics:
+  - ARIA labels for all charts and metrics
+  - Screen reader support for interactive elements
+  - Keyboard navigation improvements
+  - Role attributes for semantic structure
+  - Focus management for modals
+- Improved error handling and loading states:
+  - Loading indicators for data fetching
+  - Error recovery mechanisms
+  - No data state handling
+  - Last updated timestamps
+  - Retry functionality
+- Comprehensive documentation:
+  - New community-analytics.md with detailed feature documentation
+  - Updated accessibility guidelines
+  - Error handling procedures
+  - Best practices for data interpretation
+
+### Changed
+
+- Enhanced visual consistency:
+  - Standardized icon sizes and styles
+  - Unified color palette usage
+  - Consistent spacing and typography
+  - Improved chart layouts
+  - Better visual hierarchy
+- Improved data presentation:
+  - Added loading states for data fetching
+  - Enhanced error messages
+  - Better handling of edge cases
+  - More informative tooltips
+  - Clearer metric formatting
+
+### Fixed
+
+- Chart click handler TypeScript error
+- Loading state management
+- Error boundary implementation
+- Screen reader announcement timing
+- Focus trap in modals
+- Data refresh reliability

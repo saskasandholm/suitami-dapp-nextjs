@@ -55,7 +55,7 @@ export default function TrainingConfig({ agentId, onConfigUpdate }: TrainingConf
           </div>
           <div>
             <Title className="text-white">Training Configuration</Title>
-            <Text className="text-white/70">Customize your model's training parameters</Text>
+            <Text className="text-white/70">Customize your model&apos;s training parameters</Text>
           </div>
         </div>
         <Badge className="bg-accent/10 text-accent">Advanced Settings</Badge>

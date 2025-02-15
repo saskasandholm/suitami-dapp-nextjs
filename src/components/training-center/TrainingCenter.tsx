@@ -35,6 +35,7 @@ import {
 } from '@heroicons/react/24/outline';
 import TrainingConfig from './TrainingConfig';
 import TrainingHistory from './TrainingHistory';
+import Image from 'next/image';
 
 interface TrainingAgent {
   id: string;
@@ -729,9 +730,11 @@ export default function TrainingCenter() {
                       <div className="flex items-center">
                         <div className="w-12 h-12 rounded-full bg-[#87fafd]/10 flex items-center justify-center mr-4 overflow-hidden">
                           {agent.avatar ? (
-                            <img
+                            <Image
                               src={agent.avatar}
                               alt={agent.name}
+                              width={48}
+                              height={48}
                               className="w-full h-full object-cover"
                             />
                           ) : (

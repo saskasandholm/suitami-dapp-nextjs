@@ -2,273 +2,230 @@
 
 ## Overview
 
-The Training Center provides a centralized interface for reviewing and providing feedback on AI agent actions. The primary focus is on the "Review Activity" tab, which enables efficient review and feedback collection for agent responses across different platforms.
+The Training Center is a comprehensive platform for reviewing, providing feedback on, and improving AI agent actions. The interface is split into two main sections:
+
+1. **Review Activity (MVP Focus)**: A streamlined interface for community feedback and agent improvement
+2. **Advanced Training**: Additional tools for fine-tuning agent behavior (future iterations)
 
 ## Core Features (MVP)
 
 ### Review Activity Tab
 
-- Combined view of all agents' actions with filtering and search
-- Voting system for providing feedback on agent responses
-- Edit functionality for correcting agent responses
-- Direct links to original content
-- Basic metrics dashboard
-- Comprehensive accessibility support
-- Responsive design for all devices
+#### Action Feed
 
-### Action Feed
-
-- Clear visual indicators for different action types (replies, posts, moderation)
-- Truncated content with "Show More" option for long responses
-- Context display for better understanding
-- "Needs Review" badges for unreviewed actions
-- Sorting options (newest, oldest, most upvotes, most downvotes)
-- Tooltips for all interactive elements
+- Real-time display of agent actions across all platforms
+- Clear visual hierarchy with action type indicators
+- Context preservation for better understanding
+- Truncated content with "Show More" functionality
+- Comprehensive tooltips for all interactive elements
 - Keyboard navigation support
+- Mobile-optimized interface
+
+#### Voting System
+
+- Immediate visual feedback with animations
+- Clear vote count display
+- "(Voted)" label for user's votes
+- Vote status tooltips
+- Timestamp tracking
+- Ring highlights for active votes
+
+#### Edit Functionality
+
+- Version history tracking
+- Clear edit button placement
+- Visual indication of editable actions
+- Improved save/cancel confirmation
+- Auto-save for unsaved changes
+- Edit history tracking
+
+#### Direct Links
+
+- Clear link button placement
+- Enhanced hover feedback
+- New tab opening behavior
+- Platform-specific icons
+- Link status indicators
 
 ### Metrics Dashboard
 
-- Pending reviews count
-- Reviewed actions count
-- Positive votes tally
-- Negative votes tally
-- Real-time updates
-- Responsive layout
+#### Real-time Metrics
 
-### Search and Filters
+- Pending reviews counter
+- Reviewed actions tally
+- Positive/negative vote tracking
+- Platform-specific metrics
+- Agent performance indicators
 
-- Full-text search across actions and agent responses
-- Platform filters (Discord, Telegram, Twitter)
-- Action type filters (replies, posts, moderation)
-- Agent type filters (Management, Support, Curation)
-- Keyboard-accessible dropdown menus
-- Clear visual feedback on active filters
+#### Filtering and Search
+
+- Full-text search across actions
+- Platform-specific filters
+- Action type categorization
+- Agent type filtering
+- Advanced sorting options
+- Filter combinations
 
 ## Accessibility Features
 
-### Navigation and Controls
+### Keyboard Navigation
 
-- Full keyboard navigation support
-- Focus management for modal dialogs
-- Skip links for main content
-- ARIA labels for all interactive elements
-- Role attributes for semantic structure
-- Focus indicators for all interactive elements
+- Full keyboard support
+- Clear focus indicators
+- Skip navigation links
+- Logical tab order
+- Keyboard shortcuts
+- Focus trap in modals
 
 ### Screen Reader Support
 
-- Descriptive announcements for actions
-- Context and response separation
-- Status updates for votes and edits
-- Clear error messages
+- ARIA labels
+- Role attributes
+- Status announcements
+- Error notifications
 - Progress indicators
-- Alternative text for icons
+- Context preservation
 
 ### Visual Accessibility
 
-- High contrast mode support
-- Consistent color usage
+- High contrast support
 - Clear visual hierarchy
+- Consistent spacing
 - Adequate text sizing
-- Proper spacing
-- Focus visible indicators
+- Color blind friendly
+- Mobile optimization
 
 ## Error Handling
 
 ### Vote Operations
 
-- Automatic retry for failed votes
-- Visual feedback for vote status
-- Network error recovery
+- Automatic retry
+- Visual feedback
+- Network recovery
 - Conflict resolution
-- Rate limiting feedback
-- Offline mode support
+- Rate limiting
+- Offline support
 
 ### Edit Operations
 
-- Local storage for unsaved changes
-- Auto-save functionality
+- Auto-save
+- Version control
 - Conflict detection
-- Version history tracking
 - Validation feedback
 - Undo/redo support
-
-### Network Issues
-
-- Offline detection
-- Retry mechanisms
 - Progress preservation
-- Error notifications
-- Recovery options
-- Data synchronization
 
 ## Best Practices
 
 ### Reviewing Actions
 
-1. Review context before voting
-2. Use consistent voting criteria
+1. Review context first
+2. Use consistent criteria
 3. Provide constructive edits
-4. Check original content when needed
-5. Focus on unreviewed actions first
-6. Document significant edits
+4. Check original content
+5. Focus on unreviewed items
+6. Document significant changes
 
-### Performance Optimization
+### Mobile Usage
 
-1. Efficient filter usage
-2. Regular cache clearing
-3. Batch operations when possible
-4. Minimize unnecessary refreshes
-5. Use keyboard shortcuts
-6. Leverage local storage
-
-### Data Management
-
-1. Regular progress saving
-2. Version control for edits
-3. Backup important changes
-4. Clear old cached data
-5. Export important feedback
-6. Document special cases
+1. Use landscape for editing
+2. Enable auto-rotate
+3. Utilize swipe gestures
+4. Save progress regularly
+5. Check network strength
+6. Use offline mode when needed
 
 ## Keyboard Shortcuts
 
 ### Navigation
 
-- `Tab`: Move through interactive elements
-- `Shift + Tab`: Reverse navigation
-- `Enter/Space`: Activate buttons
-- `Esc`: Close modals/cancel edits
-- `Arrow Keys`: Navigate action list
-- `Home/End`: Jump to start/end
+- `Tab`: Next element
+- `Shift + Tab`: Previous element
+- `Enter/Space`: Activate
+- `Esc`: Close/Cancel
+- `Arrow Keys`: List navigation
+- `Home/End`: Start/End of list
 
 ### Actions
 
-- `Ctrl/Cmd + Enter`: Save edits
-- `Ctrl/Cmd + Z`: Undo edit
-- `Ctrl/Cmd + Shift + Z`: Redo edit
 - `Alt + U`: Upvote
 - `Alt + D`: Downvote
-- `Alt + E`: Start editing
-
-## Mobile Support
-
-### Responsive Design
-
-- Adaptive layouts for all screen sizes
-- Touch-friendly interface
-- Swipe gestures for common actions
-- Collapsible sections
-- Mobile-optimized filters
-- Touch-friendly buttons
-
-### Performance
-
-- Optimized loading times
-- Reduced animation complexity
-- Efficient resource usage
-- Bandwidth-aware operations
-- Battery-friendly features
-- Offline capabilities
-
-## Future Enhancements
-
-The Advanced Training tab will provide additional features for fine-tuning agent behavior in future releases. The current MVP focuses on the Review Activity workflow for gathering community feedback and improving agent responses.
-
-## Features
-
-### Agent Training Management
-
-- Overview of all agents and their training status
-- Real-time training progress monitoring
-- Interactive start/stop controls
-- Visual status indicators
-- Training configuration display
-
-### Training Visualization
-
-- Real-time accuracy metrics
-- Loss function tracking
-- Interactive performance charts
-- Training progress indicators
-- Epoch completion tracking
-
-### Agent Selection
-
-- Grid view of available agents
-- Status-based filtering
-- Platform-specific grouping
-- Quick-access training controls
-- Visual status indicators
-
-## Usage
-
-### Starting Training
-
-1. Navigate to the Training Center
-2. Select an agent from the grid
-3. Review training configuration
-4. Click "Start Training" button
-5. Monitor progress in real-time
-
-### Monitoring Progress
-
-1. View real-time metrics
-2. Track accuracy and loss
-3. Monitor epoch progress
-4. Check validation metrics
-5. Review training speed
-
-### Managing Training
-
-1. Start/stop training as needed
-2. Review performance metrics
-3. Adjust training parameters
-4. Monitor resource usage
-5. Save training checkpoints
-
-## Training Metrics
-
-### Accuracy Metrics
-
-- Training accuracy
-- Validation accuracy
-- Epoch-wise progress
-- Moving averages
-- Performance trends
-
-### Loss Metrics
-
-- Training loss
-- Validation loss
-- Loss convergence
-- Gradient metrics
-- Optimization status
-
-## Best Practices
-
-1. Review training configuration before starting
-2. Monitor validation metrics closely
-3. Stop training if metrics plateau
-4. Save checkpoints regularly
-5. Document training parameters
-6. Compare performance across runs
+- `Alt + E`: Edit
+- `Ctrl/Cmd + Enter`: Save
+- `Ctrl/Cmd + Z`: Undo
+- `Ctrl/Cmd + Shift + Z`: Redo
 
 ## Technical Details
 
-- Training batch size: 32
-- Learning rate: 0.001
-- Optimizer: Adam
-- Loss function: Cross Entropy
-- Validation split: 20%
-- Maximum epochs: 100
-- Early stopping patience: 10
-- Model checkpointing: Every 5 epochs
+### Performance
 
-## Integration
+- Optimized loading
+- Efficient caching
+- Bandwidth management
+- Battery optimization
+- Memory management
+- Offline capabilities
 
-- Connects with Knowledge Base for training data
-- Uses uploaded documents and URLs
-- Incorporates FAQ data
-- Supports multiple platforms
-- Real-time metric updates
+### Security
+
+- Vote verification
+- Edit authorization
+- Rate limiting
+- Data encryption
+- Session management
+- Audit logging
+
+## Future Enhancements
+
+### Advanced Training Tab
+
+- Fine-tuning controls
+- Model architecture settings
+- Training visualization
+- Performance metrics
+- Knowledge integration
+- Custom dataset support
+
+### Planned Features
+
+- Batch operations
+- Advanced analytics
+- Custom templates
+- API integration
+- Automated testing
+- Performance monitoring
+
+## Support
+
+### Documentation
+
+- Regular updates
+- Version history
+- Change tracking
+- Best practices
+- Troubleshooting
+- FAQ maintenance
+
+### Community
+
+- Feedback collection
+- Issue tracking
+- Feature requests
+- User guides
+- Training materials
+- Support channels
+
+## Version History
+
+### Current Version (0.13.1)
+
+- Enhanced documentation
+- Improved accessibility
+- Better error handling
+- Mobile optimization
+- Performance improvements
+- Security enhancements
+
+### Previous Versions
+
+- See CHANGELOG.md for detailed history
