@@ -18,17 +18,13 @@ const navigation = [
   { name: 'Overview', href: '/dashboard', icon: ChartBarIcon },
   { name: 'My Agents', href: '/dashboard/agents', icon: CommandLineIcon },
   { name: 'Knowledge Base', href: '/dashboard/knowledge', icon: DocumentIcon },
-  { name: 'Training Center', href: '/dashboard/training', icon: BeakerIcon },
-  { name: 'Community', href: '/dashboard/community', icon: UserGroupIcon },
-  { name: 'Conversations', href: '/dashboard/conversations', icon: ChatBubbleLeftRightIcon },
-  { name: 'Settings', href: '/dashboard/settings', icon: Cog6ToothIcon },
+  // { name: 'Training Center', href: '/dashboard/training', icon: BeakerIcon },
+  // { name: 'Community', href: '/dashboard/community', icon: UserGroupIcon },
+  // { name: 'Conversations', href: '/dashboard/conversations', icon: ChatBubbleLeftRightIcon },
+  // { name: 'Settings', href: '/dashboard/settings', icon: Cog6ToothIcon },
 ];
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
@@ -62,7 +58,9 @@ export default function DashboardLayout({
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d={isSidebarOpen ? "M11 19l-7-7 7-7m8 14l-7-7 7-7" : "M13 5l7 7-7 7M5 5l7 7-7 7"}
+                    d={
+                      isSidebarOpen ? 'M11 19l-7-7 7-7m8 14l-7-7 7-7' : 'M13 5l7 7-7 7M5 5l7 7-7 7'
+                    }
                   />
                 </svg>
               </button>
@@ -70,7 +68,7 @@ export default function DashboardLayout({
 
             <nav className="flex-1">
               <ul className="space-y-2">
-                {navigation.map((item) => {
+                {navigation.map(item => {
                   const isActive = pathname === item.href;
                   return (
                     <li key={item.name}>
@@ -111,11 +109,9 @@ export default function DashboardLayout({
 
         {/* Main Content */}
         <main className={`flex-1 ${isSidebarOpen ? 'ml-64' : 'ml-20'} transition-all duration-300`}>
-          <div className="p-8">
-            {children}
-          </div>
+          <div className="p-8">{children}</div>
         </main>
       </div>
     </div>
   );
-} 
+}
