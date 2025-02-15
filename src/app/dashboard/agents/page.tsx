@@ -1,199 +1,265 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, Title, Text, Tab, TabList, TabGroup, TabPanel, TabPanels } from "@tremor/react";
-import { motion } from "framer-motion";
+import { motion } from 'framer-motion';
 import {
-  Cog6ToothIcon,
-  DocumentTextIcon,
-  BeakerIcon,
+  PlusIcon,
+  FunnelIcon,
   ChatBubbleLeftRightIcon,
+  UserGroupIcon,
+  RocketLaunchIcon,
   CommandLineIcon,
-} from "@heroicons/react/24/outline";
-import AgentSettings from "@/components/agents/AgentSettings";
-import KnowledgeBase from "@/components/knowledge-base/KnowledgeBase";
-
-interface AgentTemplate {
-  id: string;
-  name: string;
-  description: string;
-  type: string;
-  platform: string;
-  avatar?: string;
-}
-
-const initialTemplates: AgentTemplate[] = [
-  {
-    id: '1',
-    name: 'Community Manager',
-    description: 'Manages community interactions and moderates content',
-    type: 'Management',
-    platform: 'Discord',
-  },
-  {
-    id: '2',
-    name: 'Support Agent',
-    description: 'Handles user inquiries and technical support',
-    type: 'Support',
-    platform: 'Telegram',
-  },
-  {
-    id: '3',
-    name: 'Content Curator',
-    description: 'Curates and shares relevant content',
-    type: 'Curation',
-    platform: 'X (Twitter)',
-  },
-];
+  GlobeAltIcon,
+} from '@heroicons/react/24/outline';
+import {
+  DiscordLogoIcon,
+  TwitterLogoIcon,
+  InstagramLogoIcon,
+  LinkedInLogoIcon,
+} from '@radix-ui/react-icons';
 
 export default function AgentsPage() {
-  const [selectedTemplate, setSelectedTemplate] = useState<AgentTemplate | null>(null);
-  const [activeTab, setActiveTab] = useState('configuration');
+  const [activeFilter, setActiveFilter] = useState('all');
+  const [activePlatformFilter, setActivePlatformFilter] = useState('all');
+  const [showDeployModal, setShowDeployModal] = useState(false);
 
-  const handleAgentUpdate = (data: { name: string; avatar?: File }) => {
-    if (selectedTemplate) {
-      setSelectedTemplate({
-        ...selectedTemplate,
-        name: data.name,
-        avatar: data.avatar ? URL.createObjectURL(data.avatar) : selectedTemplate.avatar,
-      });
-    }
-  };
+  // Mock data for agents
+  const agents = [
+    {
+      id: 1,
+      name: 'Community Manager AI',
+      description: 'Manages community engagement and moderates discussions',
+      platform: 'discord',
+      useCase: 'community',
+      status: 'active',
+      metrics: {
+        messages: 1234,
+        engagement: '87%',
+        response_time: '30s',
+      },
+    },
+    {
+      id: 2,
+      name: 'Social Media Assistant',
+      description: 'Handles social media interactions and content scheduling',
+      platform: 'twitter',
+      useCase: 'engagement',
+      status: 'active',
+      metrics: {
+        messages: 856,
+        engagement: '92%',
+        response_time: '45s',
+      },
+    },
+    // Add more mock agents as needed
+  ];
+
+  const useCaseFilters = [
+    { id: 'all', name: 'All Use Cases', icon: CommandLineIcon },
+    { id: 'community', name: 'Community Management', icon: UserGroupIcon },
+    { id: 'engagement', name: 'Social Engagement', icon: ChatBubbleLeftRightIcon },
+  ];
+
+  const platformFilters = [
+    { id: 'all', name: 'All Platforms', icon: GlobeAltIcon },
+    { id: 'discord', name: 'Discord', icon: DiscordLogoIcon },
+    { id: 'twitter', name: 'Twitter', icon: TwitterLogoIcon },
+    { id: 'instagram', name: 'Instagram', icon: InstagramLogoIcon },
+    { id: 'linkedin', name: 'LinkedIn', icon: LinkedInLogoIcon },
+  ];
+
+  const deploymentTemplates = [
+    {
+      id: 'community-manager',
+      name: 'Community Manager',
+      description: 'AI agent specialized in community management and moderation',
+      platforms: ['discord', 'twitter'],
+      useCase: 'community',
+    },
+    {
+      id: 'engagement-specialist',
+      name: 'Engagement Specialist',
+      description: 'Focused on increasing social media engagement and interaction',
+      platforms: ['twitter', 'instagram', 'linkedin'],
+      useCase: 'engagement',
+    },
+  ];
 
   return (
-    <div className="space-y-8">
-      <div className="flex justify-between items-center">
+    <div className="max-w-7xl mx-auto">
+      <div className="mb-8 flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gradient">Agent Management</h1>
-          <p className="text-white/70 mt-1">Configure and train your AI agents</p>
+          <h1 className="text-3xl font-bold text-gradient">My Agents</h1>
+          <p className="text-white/70 mt-2">Manage and monitor your AI agents</p>
+        </div>
+        <button
+          onClick={() => setShowDeployModal(true)}
+          className="button-primary flex items-center"
+        >
+          <PlusIcon className="w-5 h-5 mr-2" />
+          Deploy New Agent
+        </button>
+      </div>
+
+      <div className="glass-card">
+        <div className="p-6 border-b border-white/10">
+          <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-6">
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-white/70 mb-2">Use Case</label>
+              <div className="flex space-x-2 overflow-x-auto pb-2">
+                {useCaseFilters.map(filter => (
+                  <button
+                    key={filter.id}
+                    onClick={() => setActiveFilter(filter.id)}
+                    className={`flex items-center px-4 py-2 rounded-lg border ${
+                      activeFilter === filter.id
+                        ? 'border-accent text-accent bg-accent/10'
+                        : 'border-white/10 text-white/70 hover:border-white/20'
+                    }`}
+                  >
+                    <filter.icon className="w-5 h-5 mr-2" />
+                    {filter.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-white/70 mb-2">Platform</label>
+              <div className="flex space-x-2 overflow-x-auto pb-2">
+                {platformFilters.map(filter => (
+                  <button
+                    key={filter.id}
+                    onClick={() => setActivePlatformFilter(filter.id)}
+                    className={`flex items-center px-4 py-2 rounded-lg border ${
+                      activePlatformFilter === filter.id
+                        ? 'border-accent text-accent bg-accent/10'
+                        : 'border-white/10 text-white/70 hover:border-white/20'
+                    }`}
+                  >
+                    <filter.icon className="w-5 h-5 mr-2" />
+                    {filter.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {agents
+              .filter(
+                agent =>
+                  (activeFilter === 'all' || agent.useCase === activeFilter) &&
+                  (activePlatformFilter === 'all' || agent.platform === activePlatformFilter)
+              )
+              .map(agent => (
+                <motion.div
+                  key={agent.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="p-6 rounded-xl bg-white/5 border border-white/10 hover:border-accent/50 transition-colors"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <h3 className="text-lg font-medium text-white">{agent.name}</h3>
+                      <p className="text-white/50 text-sm mt-1">{agent.description}</p>
+                    </div>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        agent.status === 'active'
+                          ? 'bg-green-500/10 text-green-500'
+                          : 'bg-yellow-500/10 text-yellow-500'
+                      }`}
+                    >
+                      {agent.status}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-4 mb-4">
+                    <div className="text-center p-2 rounded-lg bg-white/5">
+                      <p className="text-xs text-white/50">Messages</p>
+                      <p className="text-lg font-medium text-accent">{agent.metrics.messages}</p>
+                    </div>
+                    <div className="text-center p-2 rounded-lg bg-white/5">
+                      <p className="text-xs text-white/50">Engagement</p>
+                      <p className="text-lg font-medium text-accent">{agent.metrics.engagement}</p>
+                    </div>
+                    <div className="text-center p-2 rounded-lg bg-white/5">
+                      <p className="text-xs text-white/50">Response</p>
+                      <p className="text-lg font-medium text-accent">
+                        {agent.metrics.response_time}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex justify-end space-x-3">
+                    <button className="button-secondary text-sm">Configure</button>
+                    <button className="button-primary text-sm">View Details</button>
+                  </div>
+                </motion.div>
+              ))}
+          </div>
         </div>
       </div>
 
-      {/* Agent Templates */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {initialTemplates.map((template, index) => (
+      {showDeployModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center">
           <motion.div
-            key={template.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="glass-card w-full max-w-2xl max-h-[80vh] overflow-y-auto"
           >
-            <Card 
-              className={`glass-card hover-accent cursor-pointer ${
-                selectedTemplate?.id === template.id ? 'border-accent' : ''
-              }`}
-              onClick={() => setSelectedTemplate(template)}
-            >
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 rounded-full bg-[#87fafd]/10 flex items-center justify-center mr-4 overflow-hidden">
-                  {template.avatar ? (
-                    <img 
-                      src={template.avatar} 
-                      alt={template.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <CommandLineIcon className="w-6 h-6 text-accent" />
-                  )}
-                </div>
-                <div>
-                  <Title className="text-white">{template.name}</Title>
-                  <Text className="text-white/70">{template.type}</Text>
+            <div className="p-6 border-b border-white/10">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-medium text-white">Deploy New Agent</h2>
+                <button
+                  onClick={() => setShowDeployModal(false)}
+                  className="text-white/50 hover:text-white"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+            <div className="p-6 space-y-6">
+              <div>
+                <h3 className="text-lg font-medium text-white mb-4">Choose a Template</h3>
+                <div className="space-y-4">
+                  {deploymentTemplates.map(template => (
+                    <div
+                      key={template.id}
+                      className="p-4 rounded-lg border border-white/10 hover:border-accent/50 cursor-pointer transition-colors"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <h4 className="text-white font-medium">{template.name}</h4>
+                          <p className="text-white/50 text-sm mt-1">{template.description}</p>
+                        </div>
+                        <div className="flex space-x-2">
+                          {template.platforms.map(platform => {
+                            const PlatformIcon =
+                              platformFilters.find(f => f.id === platform)?.icon || GlobeAltIcon;
+                            return (
+                              <PlatformIcon key={platform} className="w-5 h-5 text-white/50" />
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-              <Text className="text-white/70 mb-4">{template.description}</Text>
-              <Text className="text-white/70">Platform: {template.platform}</Text>
-            </Card>
+              <div className="flex justify-end space-x-3">
+                <button onClick={() => setShowDeployModal(false)} className="button-secondary">
+                  Cancel
+                </button>
+                <button className="button-primary flex items-center">
+                  <RocketLaunchIcon className="w-5 h-5 mr-2" />
+                  Deploy Agent
+                </button>
+              </div>
+            </div>
           </motion.div>
-        ))}
-      </div>
-
-      {/* Agent Configuration Tabs */}
-      {selectedTemplate && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          <Card className="glass-card">
-            <Title className="text-white mb-6">Configure {selectedTemplate.name}</Title>
-            <TabGroup>
-              <TabList className="border-b border-white/10">
-                <Tab 
-                  className="text-white/70 hover:text-accent"
-                  onClick={() => setActiveTab('configuration')}
-                >
-                  <Cog6ToothIcon className="w-5 h-5 mr-2 inline-block" />
-                  Configuration
-                </Tab>
-                <Tab 
-                  className="text-white/70 hover:text-accent"
-                  onClick={() => setActiveTab('knowledge')}
-                >
-                  <DocumentTextIcon className="w-5 h-5 mr-2 inline-block" />
-                  Agent Knowledge Base
-                </Tab>
-                <Tab 
-                  className="text-white/70 hover:text-accent"
-                  onClick={() => setActiveTab('training')}
-                >
-                  <BeakerIcon className="w-5 h-5 mr-2 inline-block" />
-                  Training Data
-                </Tab>
-                <Tab 
-                  className="text-white/70 hover:text-accent"
-                  onClick={() => setActiveTab('responses')}
-                >
-                  <ChatBubbleLeftRightIcon className="w-5 h-5 mr-2 inline-block" />
-                  Responses
-                </Tab>
-              </TabList>
-              <TabPanels>
-                <TabPanel>
-                  <div className="mt-6">
-                    <AgentSettings
-                      agentId={selectedTemplate.id}
-                      initialName={selectedTemplate.name}
-                      initialAvatar={selectedTemplate.avatar}
-                      onUpdate={handleAgentUpdate}
-                    />
-                  </div>
-                </TabPanel>
-                <TabPanel>
-                  <div className="mt-6">
-                    <Card className="glass-card">
-                      <Title className="text-white mb-4">{selectedTemplate.name} Knowledge Base</Title>
-                      <KnowledgeBase agentId={selectedTemplate.id} />
-                    </Card>
-                  </div>
-                </TabPanel>
-                <TabPanel>
-                  <div className="mt-6">
-                    <Card className="glass-card">
-                      <Title className="text-white mb-4">Training Examples</Title>
-                      <Text className="text-white/70">
-                        Add specific training examples and scenarios for {selectedTemplate.name}
-                      </Text>
-                      {/* Training data component will go here */}
-                    </Card>
-                  </div>
-                </TabPanel>
-                <TabPanel>
-                  <div className="mt-6">
-                    <Card className="glass-card">
-                      <Title className="text-white mb-4">Response Templates</Title>
-                      <Text className="text-white/70">
-                        Configure how {selectedTemplate.name} responds to different scenarios
-                      </Text>
-                      {/* Response templates component will go here */}
-                    </Card>
-                  </div>
-                </TabPanel>
-              </TabPanels>
-            </TabGroup>
-          </Card>
-        </motion.div>
+        </div>
       )}
     </div>
   );
-} 
+}

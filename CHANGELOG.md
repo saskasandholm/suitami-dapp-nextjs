@@ -136,3 +136,27 @@
 - Updated settings navigation to include moderation log
 - Improved action tracking granularity
 - Enhanced log entry styling and readability
+
+## [0.12.2] - 2024-02-14
+
+### Added
+
+- Enhanced Agents page with new features:
+  - Agent deployment system with templates
+  - Filtering by use case (Community Management, Social Engagement)
+  - Platform-specific filtering (Discord, Twitter, Instagram, LinkedIn)
+  - Agent metrics dashboard
+  - Status indicators for active agents
+  - Quick actions for configuration and details
+- New deployment modal with:
+  - Pre-configured templates for different use cases
+  - Multi-platform support
+  - Visual platform indicators
+  - Streamlined deployment process
+
+### Changed
+
+- Redesigned agents list view with metrics
+- Improved filtering UI with platform-specific icons
+- Enhanced agent card design with status and metrics
+- Added Radix UI icons for better platform representation
