@@ -35,16 +35,8 @@ export default function KnowledgeBaseURLsPanel({
         await onAdd(title, url);
         setTitle('');
         setUrl('');
-        addNotification({
-          type: 'success',
-          message: 'Source added successfully',
-        });
       } catch (error) {
-        addNotification({
-          type: 'error',
-          message: error instanceof Error ? error.message : 'Failed to add source',
-          isPersistent: true,
-        });
+        // Error notification is handled by parent
       } finally {
         setIsAdding(false);
       }
@@ -55,16 +47,8 @@ export default function KnowledgeBaseURLsPanel({
     setDeletingId(id);
     try {
       await onDelete(id);
-      addNotification({
-        type: 'success',
-        message: 'Source deleted successfully',
-      });
     } catch (error) {
-      addNotification({
-        type: 'error',
-        message: error instanceof Error ? error.message : 'Failed to delete source',
-        isPersistent: true,
-      });
+      // Error notification is handled by parent
     } finally {
       setDeletingId(null);
     }

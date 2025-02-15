@@ -32,19 +32,11 @@ export default function KnowledgeBaseFAQsPanel({
       setIsAdding(true);
       try {
         await onAdd(question, answer, category as FAQCategory);
-        addNotification({
-          type: 'success',
-          message: 'FAQ added successfully',
-        });
         setQuestion('');
         setAnswer('');
         setCategory('');
       } catch (error) {
-        addNotification({
-          type: 'error',
-          message: error instanceof Error ? error.message : 'Failed to add FAQ',
-          isPersistent: true,
-        });
+        // Error notification is handled by parent
       } finally {
         setIsAdding(false);
       }
@@ -55,16 +47,8 @@ export default function KnowledgeBaseFAQsPanel({
     setDeletingId(id);
     try {
       await onDelete(id);
-      addNotification({
-        type: 'success',
-        message: 'FAQ deleted successfully',
-      });
     } catch (error) {
-      addNotification({
-        type: 'error',
-        message: error instanceof Error ? error.message : 'Failed to delete FAQ',
-        isPersistent: true,
-      });
+      // Error notification is handled by parent
     } finally {
       setDeletingId(null);
     }

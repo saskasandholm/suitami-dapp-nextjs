@@ -74,3 +74,19 @@
 
 - Fixed "attempting to export metadata from a component marked with 'use client'" error
 - Resolved metadata export issues in client components
+
+## [0.11.8] - 2024-02-14
+
+### Fixed
+
+- Removed duplicate notifications by removing Pages Router implementation
+- Cleaned up legacy \_app.tsx file
+- Ensured single instance of NotificationProvider in App Router
+
+## [0.11.9] - 2024-02-14
+
+### Fixed
+
+- Removed duplicate notifications in FAQ and URL panels by centralizing notification handling in parent component
+- Improved notification management in knowledge base components
+- Ensured consistent notification behavior across all knowledge base panels
