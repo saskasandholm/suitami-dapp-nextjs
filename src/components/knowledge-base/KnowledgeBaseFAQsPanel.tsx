@@ -112,9 +112,7 @@ export default function KnowledgeBaseFAQsPanel({
           </div>
           <button
             type="submit"
-            className={`w-full bg-accent hover:bg-accent/80 text-black px-4 py-2 rounded-lg transition-opacity ${
-              isAdding ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
+            className={`button-primary w-full ${isAdding ? 'opacity-50 cursor-not-allowed' : ''}`}
             disabled={isAdding}
           >
             {isAdding ? (

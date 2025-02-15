@@ -15,7 +15,7 @@
   html {
     @apply bg-[#000000];
   }
-  
+
   body {
     @apply bg-gradient-to-b from-[#011829] via-[#030f1c] to-black min-h-screen text-white;
     background-attachment: fixed;
@@ -30,7 +30,7 @@
   .glass-card {
     @apply bg-black/20 backdrop-blur-lg border border-white/10 rounded-xl;
   }
-  
+
   .glass-effect {
     @apply bg-black/20 backdrop-blur-lg;
   }
@@ -75,6 +75,18 @@
   .card-dark {
     @apply bg-black/40 backdrop-blur-md border border-white/5 rounded-xl;
   }
+
+  .page-header {
+    @apply mb-8 flex justify-between items-center;
+  }
+
+  .page-title {
+    @apply text-3xl font-bold text-gradient;
+  }
+
+  .page-description {
+    @apply text-white/70 mt-2;
+  }
 }
 
 /* Tremor overrides */
@@ -94,11 +106,12 @@
   @apply text-white/70 hover:text-accent !important;
 }
 
-.tremor-Tab-root[data-headlessui-state="selected"] {
+.tremor-Tab-root[data-headlessui-state='selected'] {
   @apply text-accent border-accent !important;
 }
 
-.tremor-AreaChart-root, .tremor-BarChart-root {
+.tremor-AreaChart-root,
+.tremor-BarChart-root {
   @apply text-white/70 !important;
 }
 
@@ -106,6 +119,51 @@
   @apply text-white/70 !important;
 }
 
-.tremor-Title-root, .tremor-Text-root {
+.tremor-Title-root,
+.tremor-Text-root {
   @apply text-white/90 !important;
+}
+
+@keyframes goldGradientFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes accentGlow {
+  0% {
+    background-position: 0% 50%;
+    box-shadow: 0 0 20px rgba(135, 250, 253, 0.2);
+  }
+  50% {
+    background-position: 100% 50%;
+    box-shadow: 0 0 30px rgba(135, 250, 253, 0.4);
+  }
+  100% {
+    background-position: 0% 50%;
+    box-shadow: 0 0 20px rgba(135, 250, 253, 0.2);
+  }
+}
+
+.button-deploy {
+  @apply button-primary relative overflow-hidden transition-all duration-300;
+}
+
+.button-deploy:hover {
+  background: linear-gradient(
+    90deg,
+    rgba(135, 250, 253, 0.3) 0%,
+    rgba(135, 250, 253, 0.4) 50%,
+    rgba(135, 250, 253, 0.3) 100%
+  );
+  background-size: 200% auto;
+  animation: accentGlow 3s infinite;
+  transform: translateY(-1px);
+  @apply border-accent/50;
 }
