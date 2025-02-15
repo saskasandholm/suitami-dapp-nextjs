@@ -69,7 +69,19 @@ Please read our contributing guidelines before submitting pull requests.
 
 ## Changelog
 
+### Version 0.11.4 (Latest)
+
+- Added Git Hooks and CI:
+  - Implemented Husky for Git hooks
+  - Added lint-staged for pre-commit checks
+  - Set up GitHub Actions workflow for CI
+  - Added Prettier configuration
+  - Enhanced code quality automation
+  - Improved developer workflow
+  - Added automated checks for TypeScript, ESLint, and builds
+
 ### Version 0.11.3 (Latest)
+
 - Fixed Layout and Styling Issues:
   - Improved layout structure with proper nesting
   - Fixed dashboard layout and sidebar behavior
@@ -80,6 +92,7 @@ Please read our contributing guidelines before submitting pull requests.
   - Enhanced responsive design
 
 ### Version 0.11.2 (Latest)
+
 - Improved KnowledgeBase Component Architecture:
   - Created shared types for Document, Source, and FAQ interfaces
   - Simplified form handling with local state management
@@ -88,6 +101,7 @@ Please read our contributing guidelines before submitting pull requests.
   - Enhanced UI/UX with better loading states and error handling
 
 ### Version 0.11.1
+
 - Fixed TypeScript Interface Consistency:
   - Added missing title and subtitle properties to Document, Source, and FAQ interfaces
   - Made agentId prop optional in KnowledgeBase component for standalone usage
@@ -97,6 +111,7 @@ Please read our contributing guidelines before submitting pull requests.
   - Added proper TypeScript generics for item data handling
 
 ### Version 0.11.0
+
 - Fixed TypeScript Configuration and Component Structure:
   - Updated TypeScript configuration for better type safety
   - Fixed moduleResolution in tsconfig.json
@@ -108,6 +123,7 @@ Please read our contributing guidelines before submitting pull requests.
   - Improved code organization and maintainability
 
 ### Version 0.10.0
+
 - Enhanced Knowledge Base Management:
   - Added real-time loading states and progress indicators for document processing and URL indexing
   - Implemented comprehensive form validation with clear error messages
@@ -119,6 +135,7 @@ Please read our contributing guidelines before submitting pull requests.
   - Improved accessibility with ARIA labels and error descriptions
 
 ### [0.9.0] - 2024-02-12
+
 - Enhanced Navigation and User Flow:
   - Improved tab organization in Agents page
   - Renamed "Settings" tab to "Configuration" for clarity
@@ -134,6 +151,7 @@ Please read our contributing guidelines before submitting pull requests.
   - Added clear section descriptions and placeholders
 
 ### [0.8.0] - 2024-02-12
+
 - Added Agent Customization Features:
   - Profile picture upload and management
   - Agent name customization
@@ -146,6 +164,7 @@ Please read our contributing guidelines before submitting pull requests.
   - Improved agent card design with avatars
 
 ### [0.7.0] - 2024-02-12
+
 - Added dedicated Knowledge Base and Training Center pages:
   - New sidebar navigation items for quick access
   - Standalone Knowledge Base page for centralized data management
@@ -156,6 +175,7 @@ Please read our contributing guidelines before submitting pull requests.
   - Unified training management interface
 
 ### [0.6.0] - 2024-02-12
+
 - Added Knowledge Base Management:
   - PDF document upload and processing
   - URL source management with indexing
@@ -166,6 +186,7 @@ Please read our contributing guidelines before submitting pull requests.
   - Drag-and-drop file upload support
 
 ### [0.5.0] - 2024-02-12
+
 - Enhanced Agent Management page with:
   - Integrated real-time training visualization
   - Interactive training controls (start/stop)
@@ -175,6 +196,7 @@ Please read our contributing guidelines before submitting pull requests.
   - Improved template selection UI
 
 ### [0.4.0] - 2024-02-12
+
 - Added Conversations page with:
   - Real-time conversation monitoring
   - Message filtering by category and platform
@@ -189,6 +211,7 @@ Please read our contributing guidelines before submitting pull requests.
   - Training status indicators
 
 ### [0.3.0] - 2024-02-12
+
 - Added Community Analytics page with:
   - Member growth tracking
   - Platform-specific engagement metrics
@@ -204,6 +227,7 @@ Please read our contributing guidelines before submitting pull requests.
   - Resource usage monitoring
 
 ### [0.2.0] - 2024-02-12
+
 - Added Dashboard layout with collapsible sidebar
 - Implemented dark theme with custom colors (#011829, #030f1c, #000000, #87fafd)
 - Created Dashboard overview page with:
@@ -222,6 +246,7 @@ Please read our contributing guidelines before submitting pull requests.
 - Implemented responsive design for all pages
 
 ### [0.1.0] - 2024-02-12
+
 - Initial project setup
 - Basic project structure
 - Documentation setup
