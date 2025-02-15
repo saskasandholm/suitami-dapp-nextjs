@@ -90,3 +90,49 @@
 - Removed duplicate notifications in FAQ and URL panels by centralizing notification handling in parent component
 - Improved notification management in knowledge base components
 - Ensured consistent notification behavior across all knowledge base panels
+
+## [0.12.0] - 2024-02-14
+
+### Added
+
+- Comprehensive settings page with multiple sections:
+  - Profile management with user information
+  - Team management with role controls
+  - Notification preferences for agent updates
+  - Security settings with 2FA support
+  - Admin controls for API and webhook management
+- Enhanced UI components:
+  - Custom toggle switches for preferences
+  - Responsive grid layouts
+  - Animated tab transitions
+  - Modern form controls
+- Display preferences for agent views and metrics
+- Usage statistics dashboard in admin panel
+
+### Changed
+
+- Updated global button styling
+- Improved form input consistency
+- Enhanced mobile responsiveness for settings panels
+
+## [0.12.1] - 2024-02-14
+
+### Added
+
+- New Moderation Log tab in settings:
+  - Detailed activity tracking for admin actions
+  - Filterable log entries by action type
+  - Timestamp and moderator tracking
+  - Export functionality for logs
+  - Pagination support for log entries
+- Enhanced logging interface with:
+  - Action categorization
+  - Target identification
+  - Detailed action descriptions
+  - Chronological ordering
+
+### Changed
+
+- Updated settings navigation to include moderation log
+- Improved action tracking granularity
+- Enhanced log entry styling and readability

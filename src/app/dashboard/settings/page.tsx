@@ -9,6 +9,7 @@ import {
   UsersIcon,
   KeyIcon,
   ArrowLeftOnRectangleIcon,
+  ClipboardDocumentListIcon,
 } from '@heroicons/react/24/outline';
 
 export default function SettingsPage() {
@@ -20,6 +21,51 @@ export default function SettingsPage() {
     { id: 'preferences', name: 'Preferences', icon: BellIcon },
     { id: 'security', name: 'Security', icon: ShieldCheckIcon },
     { id: 'admin', name: 'Admin Controls', icon: KeyIcon },
+    { id: 'modlog', name: 'Moderation Log', icon: ClipboardDocumentListIcon },
+  ];
+
+  // Mock moderation log data
+  const moderationLogs = [
+    {
+      id: 1,
+      action: 'User Role Updated',
+      target: 'john.doe@example.com',
+      moderator: 'Admin',
+      details: 'Changed role from Member to Admin',
+      timestamp: '2024-02-14 15:30:45',
+    },
+    {
+      id: 2,
+      action: 'API Key Generated',
+      target: 'System',
+      moderator: 'Admin',
+      details: 'New API key generated for production environment',
+      timestamp: '2024-02-14 14:22:10',
+    },
+    {
+      id: 3,
+      action: 'Document Removed',
+      target: 'Knowledge Base',
+      moderator: 'Moderator',
+      details: 'Removed outdated documentation',
+      timestamp: '2024-02-14 12:15:33',
+    },
+    {
+      id: 4,
+      action: 'Team Member Added',
+      target: 'sarah.smith@example.com',
+      moderator: 'Admin',
+      details: 'Added new team member with Viewer role',
+      timestamp: '2024-02-14 10:05:21',
+    },
+    {
+      id: 5,
+      action: 'Security Setting Changed',
+      target: 'System',
+      moderator: 'Admin',
+      details: '2FA requirement enabled for all team members',
+      timestamp: '2024-02-14 09:30:00',
+    },
   ];
 
   const handleLogout = () => {
@@ -442,6 +488,70 @@ export default function SettingsPage() {
                         <p className="text-2xl font-bold text-accent">64.2 GB</p>
                       </div>
                     </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {activeTab === 'modlog' && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-8"
+            >
+              <div>
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-xl font-medium text-white">Moderation Log</h3>
+                  <div className="flex items-center space-x-4">
+                    <select className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white/70">
+                      <option value="all">All Actions</option>
+                      <option value="user">User Actions</option>
+                      <option value="system">System Changes</option>
+                      <option value="security">Security Events</option>
+                    </select>
+                    <button className="button-secondary">Export Log</button>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {moderationLogs.map(log => (
+                    <div
+                      key={log.id}
+                      className="p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="space-y-1">
+                          <div className="flex items-center space-x-2">
+                            <span className="text-accent font-medium">{log.action}</span>
+                            <span className="text-white/50">•</span>
+                            <span className="text-white/70">{log.target}</span>
+                          </div>
+                          <p className="text-white/50 text-sm">{log.details}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-white/70 text-sm">{log.moderator}</p>
+                          <p className="text-white/50 text-xs">{log.timestamp}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-6 flex items-center justify-between">
+                  <div className="flex items-center space-x-2 text-white/50 text-sm">
+                    <span>Showing 5 of 156 entries</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      className="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-white/70 hover:bg-white/10 disabled:opacity-50"
+                      disabled
+                    >
+                      Previous
+                    </button>
+                    <button className="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-white/70 hover:bg-white/10">
+                      Next
+                    </button>
                   </div>
                 </div>
               </div>
