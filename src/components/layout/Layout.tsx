@@ -15,7 +15,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <footer className="glass-effect border-t border-white/5 py-8">
         <div className="max-w-screen-xl mx-auto px-4">
           <div className="text-center text-white/70">
-            <p>© 2024 Suitami. All rights reserved.</p>
+            <p>© 2024 Aiden. All rights reserved.</p>
           </div>
         </div>
       </footer>

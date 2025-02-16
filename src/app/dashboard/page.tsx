@@ -7,6 +7,7 @@ import {
   CommandLineIcon,
   UserGroupIcon,
 } from '@heroicons/react/24/outline';
+import PageHeader from '@/components/layout/PageHeader';
 
 const platforms = [
   {
@@ -62,16 +63,21 @@ const agents = [
 export default function Dashboard() {
   return (
     <div className="space-y-8">
-      <div className="page-header">
-        <div>
-          <h1 className="page-title">Dashboard Overview</h1>
-          <p className="page-description">Monitor your AI agents and community engagement</p>
-        </div>
-        <button className="button-deploy flex items-center px-4 py-2">
-          <CommandLineIcon className="w-5 h-5 mr-2" />
-          Deploy New Agent
-        </button>
-      </div>
+      <PageHeader
+        title="Dashboard"
+        description="Monitor your AI agents and community engagement"
+        rightContent={
+          <div className="flex items-center space-x-4">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="px-4 py-2 bg-accent/10 hover:bg-accent/20 text-accent rounded-lg transition-colors"
+            >
+              Add Agent
+            </motion.button>
+          </div>
+        }
+      />
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

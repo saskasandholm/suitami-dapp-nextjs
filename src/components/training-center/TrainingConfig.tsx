@@ -40,7 +40,7 @@ export default function TrainingConfig({ agentId, onConfigUpdate }: TrainingConf
   const [config, setConfig] = useState<TrainingConfiguration>(defaultConfig);
   const [activeSection, setActiveSection] = useState<string>('basic');
 
-  const handleConfigChange = (key: keyof TrainingConfiguration, value: any) => {
+  const handleConfigChange = (key: keyof TrainingConfiguration, value: TrainingConfiguration[keyof TrainingConfiguration]) => {
     const newConfig = { ...config, [key]: value };
     setConfig(newConfig);
     onConfigUpdate(newConfig);

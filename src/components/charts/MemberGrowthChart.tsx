@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { CalendarIcon, ArrowTrendingUpIcon } from '@heroicons/react/24/outline';
 import { useState, useMemo } from 'react';
 import BaseChart, { chartStyles, InsightType } from './BaseChart';
-import CustomTooltip from './CustomTooltip';
+import CustomTooltip from '@/components/common/CustomTooltip';
 import { formatValue } from '@/utils/formatters';
 import type { EventProps } from '@tremor/react';
 

@@ -11,6 +11,7 @@ import {
   ArrowLeftOnRectangleIcon,
   ClipboardDocumentListIcon,
 } from '@heroicons/react/24/outline';
+import PageHeader from '@/components/layout/PageHeader';
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('profile');
@@ -75,19 +76,19 @@ export default function SettingsPage() {
 
   return (
     <div className="max-w-7xl mx-auto">
-      <div className="page-header">
-        <div>
-          <h1 className="page-title">Settings</h1>
-          <p className="page-description">Manage your account settings and preferences</p>
-        </div>
-        <button
-          onClick={handleLogout}
-          className="flex items-center px-4 py-2 text-sm font-medium text-red-400 hover:text-red-300 transition-colors"
-        >
-          <ArrowLeftOnRectangleIcon className="w-5 h-5 mr-2" />
-          Logout
-        </button>
-      </div>
+      <PageHeader
+        title="Settings"
+        description="Manage your account settings and preferences"
+        rightContent={
+          <button
+            onClick={handleLogout}
+            className="flex items-center px-4 py-2 text-sm font-medium text-red-400 hover:text-red-300 transition-colors"
+          >
+            <ArrowLeftOnRectangleIcon className="w-5 h-5 mr-2" />
+            Logout
+          </button>
+        }
+      />
 
       <div className="glass-card">
         <div className="border-b border-white/10">

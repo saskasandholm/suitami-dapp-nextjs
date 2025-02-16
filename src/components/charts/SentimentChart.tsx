@@ -1,4 +1,4 @@
-import { AreaChart, Text } from '@tremor/react';
+import { AreaChart, Text, EventProps } from '@tremor/react';
 import { motion } from 'framer-motion';
 import { 
   FaceSmileIcon, 
@@ -8,7 +8,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { useState, useMemo } from 'react';
 import BaseChart, { chartStyles } from './BaseChart';
-import CustomTooltip from './CustomTooltip';
+import CustomTooltip from '@/components/common/CustomTooltip';
 import { formatValue } from '@/utils/formatters';
 
 interface SentimentData {
@@ -19,6 +19,11 @@ interface SentimentData {
 interface SentimentChartProps {
   data: SentimentData[];
   trend?: 'up' | 'down' | 'stable';
+}
+
+type SentimentTooltipPayload = EventProps & {
+  score?: number;
+  date?: string;
 }
 
 export default function SentimentChart({ data, trend = 'up' }: SentimentChartProps) {
@@ -110,8 +115,8 @@ export default function SentimentChart({ data, trend = 'up' }: SentimentChartPro
             minValue={0}
             maxValue={100}
             startEndOnly={true}
-            onValueChange={(v: any) => {
-              setHoveredPoint(v?.score || null);
+            onValueChange={(v: EventProps | null) => {
+              setHoveredPoint((v as SentimentTooltipPayload)?.score || null);
             }}
           />
           {/* Enhanced hover effect with trend indicator */}

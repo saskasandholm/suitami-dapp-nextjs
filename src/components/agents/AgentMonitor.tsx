@@ -20,12 +20,11 @@ interface AgentMetrics {
 }
 
 interface AgentMonitorProps {
-  agentId: string;
   agentName: string;
   platform: string;
 }
 
-export default function AgentMonitor({ agentId, agentName, platform }: AgentMonitorProps) {
+export default function AgentMonitor({ agentName, platform }: AgentMonitorProps) {
   // In a real app, this would be fetched from an API
   const [metrics, setMetrics] = useState<AgentMetrics>({
     responseTimeMs: [250, 245, 260, 255, 240, 235],

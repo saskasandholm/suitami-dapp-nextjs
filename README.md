@@ -1,84 +1,39 @@
-# Suitami dApp
+# Aiden dApp
 
-A modern decentralized application for managing autonomous AI agents for Web3 communities.
-
-## Overview
-
-Suitami provides an intelligence layer that empowers Web3 communities with autonomous AI agents, trained to manage, engage, and grow your ecosystem. The platform enables seamless integration of AI agents across various platforms including Telegram, Discord, and X (Twitter).
-
-## Technology Stack
-
-- Next.js 14
-- TypeScript
-- Tailwind CSS
-- ESLint
-- pnpm (Package Manager)
-- Tremor (Analytics & Charts)
-- Framer Motion (Animations)
-- Headless UI (Accessible Components)
-- Heroicons (Icons)
-- Jest & Testing Library (Testing)
+A modern, performant Next.js application designed to help community managers and developers understand and improve community health and engagement. Aiden dApp provides real-time analytics, AI-powered insights, and automated management tools across platforms like Discord, Telegram, and Twitter.
 
 ## Features
 
-- Modern, responsive UI with exceptional polish:
-  - Sophisticated animations and transitions
-  - Perfect micro-interactions
-  - Optimized performance
-  - Comprehensive accessibility
-- Community Analytics with polished data visualization:
-  - Interactive charts with perfect animation timing
-  - Smooth transitions and natural motion
-  - Intelligent tooltips with perfect positioning
-  - Cross-chart communication with subtle highlights
-  - Responsive and accessible design
-- AI Agent Management Dashboard
-- Multi-platform Integration (Telegram, Discord, X)
-- Agent Performance Monitoring
-- Custom Agent Training Interface
-- Notification System
-  - Notification queueing for multiple messages
-  - Type-based persistence (errors persist, others auto-hide)
-  - Keyboard navigation support
-  - ARIA accessibility compliance
-  - Improved stacking and positioning
-  - Clear error messages with context
-  - Auto-hiding for non-error notifications
-- Validation System
-  - Comprehensive input validation
-  - File size and type checks
-  - URL protocol and format validation
-  - FAQ content length limits
-  - Structured data validation
-  - Real-time validation feedback
-- Document Management
-  - File upload with size and type validation
-  - Progress tracking for document processing
-  - Automatic status updates
-- URL Source Management
-  - URL validation with protocol checks
-  - Processing status tracking
-  - Easy deletion and management
-- FAQ Management
-  - Categorized FAQ entries
-  - Length validation for questions and answers
-  - Easy editing and deletion
-- Testing Infrastructure
-  - Jest configuration with coverage reporting
-  - React Testing Library integration
-  - Component-level unit tests
-  - Accessibility testing support
-  - Mock implementations for external dependencies
+### Community Analytics
+- **Real-time Insights** 📊
+  - Live community metrics and engagement tracking
+  - Anomaly detection with AI-powered analysis
+  - Customizable dashboards and reporting
+- **Multi-platform Integration** 🔗
+  - Discord, Telegram, and Twitter support
+  - Unified analytics across platforms
+  - Platform-specific metrics and insights
+- **Performance & Accessibility** ⚡
+  - Optimized chart rendering and data visualization
+  - WCAG 2.1 compliant interface
+  - Mobile-responsive design
+
+### Performance Optimizations
+- Efficient component lifecycle management
+- Optimized rendering patterns
+- Smart loading state handling
+- Error boundary implementation
+- Memory leak prevention
+
+### Technical Stack
+- [Next.js 14](https://nextjs.org/) with App Router - React framework
+- [TypeScript](https://www.typescriptlang.org/) - Type safety
+- [TailwindCSS](https://tailwindcss.com/) - Styling
+- [Tremor](https://www.tremor.so/) - Data visualization
+- [Jest](https://jestjs.io/) and [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/) - Testing
+- [ESLint](https://eslint.org/) - Code quality
 
 ## Getting Started
-
-### Prerequisites
-
-- Node.js 18.17 or later
-- pnpm
-- Modern web browser
-
-### Installation
 
 ```bash
 # Install dependencies
@@ -90,48 +45,70 @@ pnpm dev
 # Build for production
 pnpm build
 
-# Start production server
+# Run production server
 pnpm start
 
 # Run tests
 pnpm test
 
-# Run validation
-pnpm run validate
-```
-
-### Environment Variables
-
-Create a `.env.local` file in the root directory:
-
-```
-NEXT_PUBLIC_API_URL=your_api_url
-NEXT_PUBLIC_WALLET_CONNECT_ID=your_wallet_connect_id
-```
-
-## Project Structure
-
-```
-src/
-├── app/              # App router pages
-├── components/       # Reusable components
-│   ├── layout/      # Layout components
-│   ├── ui/          # UI components
-│   └── agents/      # AI agent management components
-├── styles/          # Global styles
-└── types/           # TypeScript types
+# Run linter
+pnpm lint
 ```
 
 ## Documentation
 
-Detailed documentation for each component can be found in the `docs/` directory:
+1. [Community Analytics](./docs/community-analytics.md) - Core analytics features and implementation
+2. [Layout Patterns](./docs/LAYOUT_PATTERNS.md) - UI components and design system
+3. [Knowledge Base](./docs/knowledge-base.md) - Training data management
+4. [Training Center](./docs/training-center.md) - AI agent training
+5. [Changelog](./CHANGELOG.md) - Version history and updates
 
-- [Community Analytics](docs/community-analytics.md)
-- [Training Center](docs/training-center.md)
+## Best Practices
+
+### Performance
+- Use optimized rendering patterns ([see examples](./docs/LAYOUT_PATTERNS.md#performance))
+- Implement proper loading states ([implementation guide](./docs/community-analytics.md#loading-states))
+- Handle errors gracefully ([error handling patterns](./docs/community-analytics.md#error-handling))
+- Follow React best practices ([component guidelines](./docs/LAYOUT_PATTERNS.md#best-practices))
+- Optimize data fetching ([data fetching strategies](./docs/community-analytics.md#data-fetching))
+
+### Accessibility
+- ARIA labels for interactive elements ([accessibility guide](./docs/LAYOUT_PATTERNS.md#accessibility))
+- Keyboard navigation support ([keyboard patterns](./docs/LAYOUT_PATTERNS.md#keyboard-navigation))
+- Screen reader compatibility ([screen reader support](./docs/LAYOUT_PATTERNS.md#screen-reader-support))
+- Clear visual feedback ([visual patterns](./docs/LAYOUT_PATTERNS.md#visual-accessibility))
+- Semantic HTML structure ([HTML guidelines](./docs/LAYOUT_PATTERNS.md#semantic-html))
+
+### Development
+- Follow TypeScript best practices ([type safety guide](./docs/community-analytics.md#typescript))
+- Maintain consistent code style ([style guide](./docs/LAYOUT_PATTERNS.md#style-guide))
+- Write comprehensive tests ([testing guide](./docs/community-analytics.md#testing))
+- Document code changes ([documentation guide](./docs/community-analytics.md#documentation))
+- Use proper error handling ([error patterns](./docs/community-analytics.md#error-handling))
 
 ## Contributing
 
-Please read our contributing guidelines before submitting pull requests.
+We welcome contributions to Aiden dApp! Please see our [Contributing Guide](./CONTRIBUTING.md) for detailed instructions on:
+
+1. Setting up your development environment
+2. Creating feature branches
+3. Following our coding standards
+4. Writing and running tests
+5. Submitting pull requests
+
+For major changes, please open an issue first to discuss what you would like to change.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- [Next.js](https://nextjs.org/) team for providing the powerful framework that serves as the foundation for Aiden dApp
+- [Tremor](https://www.tremor.so/) for their beautiful and performant chart components that power our analytics
+- [Framer Motion](https://www.framer.com/motion/) for enabling smooth animations that enhance our user experience
+- [Tailwind CSS](https://tailwindcss.com/) for their utility-first CSS framework that streamlines our styling
+- [HeadlessUI](https://headlessui.com/) for their accessible UI components that help maintain high accessibility standards
 
 ## Changelog
 
@@ -180,15 +157,12 @@ Please read our contributing guidelines before submitting pull requests.
   - Enhanced interactive charts and visualizations
   - Improved UI with health score card and metric cards
 
-## License
+### [0.13.8] - 2024-03-XX
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- Next.js team for the amazing framework
-- Tremor for beautiful charts
-- Framer Motion for smooth animations
-- Tailwind CSS for styling
-- HeadlessUI for accessible components
-- Testing Library team for testing utilities
+- Enhanced Performance:
+  - Optimized chart rendering
+  - Improved loading state management
+  - Removed unnecessary render states
+  - Enhanced error handling
+  - Updated documentation
+  - Improved component lifecycle management

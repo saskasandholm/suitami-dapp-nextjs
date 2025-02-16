@@ -9,6 +9,7 @@ import {
   ChatBubbleLeftRightIcon,
   ClockIcon,
 } from '@heroicons/react/24/outline';
+import PageHeader from '@/components/layout/PageHeader';
 
 // This would normally come from a central store or API
 const agentsData = {
@@ -123,115 +124,170 @@ export default function AgentDetailsPage() {
   const router = useRouter();
   const params = useParams();
   const agentId = params?.id ? parseInt(params.id as string) : null;
+  const agent = agentId && agentId in agentsData ? agentsData[agentId as keyof typeof agentsData] : null;
 
-  // Get the agent data or redirect if not found
-  const agent = agentId && agentsData[agentId as keyof typeof agentsData];
   if (!agent) {
-    router.push('/dashboard/agents');
-    return null;
+    return <div>Agent not found</div>;
   }
 
   return (
-    <div className="max-w-7xl mx-auto">
-      <button
-        onClick={() => router.back()}
-        className="flex items-center text-white/70 hover:text-white mb-6 group"
+    <div className="space-y-8">
+      <PageHeader
+        title={agent.name}
+        description={agent.description}
+        rightContent={
+          <div className="flex items-center space-x-4">
+            <motion.button
+              onClick={() => router.back()}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ 
+                type: "spring",
+                stiffness: 260,
+                damping: 20,
+                delay: 0.1 
+              }}
+              className="flex items-center px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
+            >
+              <ArrowLeftIcon className="w-5 h-5 mr-2" />
+              Back
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ 
+                type: "spring",
+                stiffness: 260,
+                damping: 20,
+                delay: 0.2 
+              }}
+              className="px-4 py-2 bg-accent/10 hover:bg-accent/20 text-accent rounded-lg transition-colors"
+            >
+              Configure Agent
+            </motion.button>
+          </div>
+        }
+      />
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="max-w-7xl mx-auto"
       >
-        <ArrowLeftIcon className="w-5 h-5 mr-2 transition-transform group-hover:-translate-x-1" />
-        Back to Agents
-      </button>
-
-      <div className="page-header">
-        <div>
-          <h1 className="page-title">{agent.name}</h1>
-          <p className="page-description">{agent.description}</p>
-        </div>
-        <span
-          className={`px-3 py-1.5 rounded-full text-sm font-medium ${
-            agent.status === 'active'
-              ? 'bg-green-500/10 text-green-500'
-              : 'bg-yellow-500/10 text-yellow-500'
-          }`}
-        >
-          {agent.status}
-        </span>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          <div className="glass-card p-6">
-            <h2 className="text-xl font-medium text-white mb-4">Performance Metrics</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              <div className="p-4 rounded-lg bg-white/5">
-                <div className="flex items-center space-x-3 mb-2">
-                  <ChatBubbleLeftRightIcon className="w-5 h-5 text-accent" />
-                  <h3 className="text-sm font-medium text-white">Messages</h3>
-                </div>
-                <p className="text-2xl font-bold text-accent">{agent.metrics.messages}</p>
-              </div>
-              <div className="p-4 rounded-lg bg-white/5">
-                <div className="flex items-center space-x-3 mb-2">
-                  <ChartBarIcon className="w-5 h-5 text-accent" />
-                  <h3 className="text-sm font-medium text-white">Engagement</h3>
-                </div>
-                <p className="text-2xl font-bold text-accent">{agent.metrics.engagement}</p>
-              </div>
-              <div className="p-4 rounded-lg bg-white/5">
-                <div className="flex items-center space-x-3 mb-2">
-                  <ClockIcon className="w-5 h-5 text-accent" />
-                  <h3 className="text-sm font-medium text-white">Response Time</h3>
-                </div>
-                <p className="text-2xl font-bold text-accent">{agent.metrics.response_time}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="glass-card p-6">
-            <h2 className="text-xl font-medium text-white mb-4">Recent Activity</h2>
-            <div className="space-y-4">
-              {agent.recentActivity.map(activity => (
-                <div
-                  key={activity.id}
-                  className="flex items-start space-x-4 p-4 rounded-lg bg-white/5"
-                >
-                  <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center">
-                    <CpuChipIcon className="w-4 h-4 text-accent" />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="lg:col-span-2 space-y-6"
+          >
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="glass-card p-6"
+            >
+              <h2 className="text-xl font-medium text-white mb-4">Performance Metrics</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <div className="p-4 rounded-lg bg-white/5">
+                  <div className="flex items-center space-x-3 mb-2">
+                    <ChatBubbleLeftRightIcon className="w-5 h-5 text-accent" />
+                    <h3 className="text-sm font-medium text-white">Messages</h3>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-white">{activity.content}</p>
-                    <p className="text-white/50 text-sm">{activity.timestamp}</p>
-                  </div>
+                  <p className="text-2xl font-bold text-accent">{agent.metrics.messages}</p>
                 </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-6">
-          <div className="glass-card p-6">
-            <h2 className="text-xl font-medium text-white mb-4">Configuration</h2>
-            <div className="space-y-4">
-              <button className="button-primary w-full">Edit Settings</button>
-              <button className="button-secondary w-full">View Logs</button>
-              <button className="button-secondary w-full">Manage Access</button>
-            </div>
-          </div>
-
-          <div className="glass-card p-6">
-            <h2 className="text-xl font-medium text-white mb-4">Advanced Metrics</h2>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-white/70">Accuracy</span>
-                <span className="text-accent font-medium">{agent.metrics.accuracy}</span>
+                <div className="p-4 rounded-lg bg-white/5">
+                  <div className="flex items-center space-x-3 mb-2">
+                    <ChartBarIcon className="w-5 h-5 text-accent" />
+                    <h3 className="text-sm font-medium text-white">Engagement</h3>
+                  </div>
+                  <p className="text-2xl font-bold text-accent">{agent.metrics.engagement}</p>
+                </div>
+                <div className="p-4 rounded-lg bg-white/5">
+                  <div className="flex items-center space-x-3 mb-2">
+                    <ClockIcon className="w-5 h-5 text-accent" />
+                    <h3 className="text-sm font-medium text-white">Response Time</h3>
+                  </div>
+                  <p className="text-2xl font-bold text-accent">{agent.metrics.response_time}</p>
+                </div>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-white/70">Uptime</span>
-                <span className="text-accent font-medium">{agent.metrics.uptime}</span>
+            </motion.div>
+
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="glass-card p-6"
+            >
+              <h2 className="text-xl font-medium text-white mb-4">Recent Activity</h2>
+              <div className="space-y-4">
+                {agent.recentActivity.map((activity, index) => (
+                  <motion.div
+                    key={activity.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.5 + index * 0.1 }}
+                    className="flex items-start space-x-4 p-4 rounded-lg bg-white/5"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center">
+                      <CpuChipIcon className="w-4 h-4 text-accent" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white">{activity.content}</p>
+                      <p className="text-white/50 text-sm">{activity.timestamp}</p>
+                    </div>
+                  </motion.div>
+                ))}
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
+
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="space-y-6"
+          >
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="glass-card p-6"
+            >
+              <h2 className="text-xl font-medium text-white mb-4">Configuration</h2>
+              <div className="space-y-4">
+                <button className="button-primary w-full">Edit Settings</button>
+                <button className="button-secondary w-full">View Logs</button>
+                <button className="button-secondary w-full">Manage Access</button>
+              </div>
+            </motion.div>
+
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="glass-card p-6"
+            >
+              <h2 className="text-xl font-medium text-white mb-4">Advanced Metrics</h2>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-white/70">Accuracy</span>
+                  <span className="text-accent font-medium">{agent.metrics.accuracy}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-white/70">Uptime</span>
+                  <span className="text-accent font-medium">{agent.metrics.uptime}</span>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

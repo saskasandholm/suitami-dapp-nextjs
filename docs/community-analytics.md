@@ -1,187 +1,428 @@
-# Community Analytics Documentation
+# Community Analytics
+
+## Quick Start
+- [Setup Guide](#setup-guide)
+- [Common Tasks](#common-tasks)
+- [Troubleshooting](#troubleshooting)
+- [API Reference](#api-reference)
+
+### Quick "Hello World" Example
+```tsx
+// 1. Install dependencies
+pnpm install @tremor/react framer-motion swr
+
+// 2. Create a basic metrics component
+import { useCommunityData } from '@/hooks/useCommunityData';
+import { Card } from '@/components/ui/Card';
+
+export function BasicMetrics() {
+  const { data, error } = useCommunityData({
+    platform: 'all',
+    timeRange: '24h'
+  });
+
+  if (error) return <div>Failed to load metrics</div>;
+  if (!data) return <div>Loading...</div>;
+
+  return (
+    <Card>
+      <h3 className="text-lg font-medium">Active Users</h3>
+      <div className="mt-4 text-2xl font-bold">
+        {data.activeUsers.toLocaleString()}
+      </div>
+    </Card>
+  );
+}
+```
+
+## Table of Contents
+1. [Overview](#overview)
+2. [Setup Guide](#setup-guide)
+3. [Features & Implementation](#features)
+   - [Performance](#performance-optimizations)
+   - [Data Visualization](#data-visualization)
+   - [Metrics & Insights](#metrics--insights)
+   - [Accessibility](#accessibility)
+4. [Common Tasks](#common-tasks)
+5. [Technical Guidelines](#technical-guidelines)
+   - [Animation](#animation-guidelines)
+   - [Error Handling](#error-handling)
+   - [Data Processing](#data-processing)
+   - [Performance](#performance-optimization)
+6. [API Reference](#api-reference)
+7. [Troubleshooting](#troubleshooting)
+8. [Contributing](#contributing)
 
 ## Overview
 
-The Community Analytics page provides comprehensive insights into community engagement, sentiment, and trends across multiple platforms (Telegram, Discord, Twitter). The interface offers real-time metrics, interactive visualizations, and detailed analytics for community management.
+The Community Analytics module provides real-time insights into community engagement, growth, and health across multiple platforms. This guide will help you understand, use, and contribute to the module effectively.
 
-## Interface Layout
+## Setup Guide
 
-### Time Range Selection
+1. **Install Dependencies**:
+```bash
+pnpm install @tremor/react framer-motion swr
+```
 
-- Quick select options: 24h, 7d, 30d, 90d
-- Custom date range picker
-- Refresh and export data controls
-- Platform filters (All Platforms, Telegram, Discord, Twitter)
+2. **Configure Environment**:
+```env
+NEXT_PUBLIC_API_BASE_URL=http://localhost:3000/api
+NEXT_PUBLIC_CACHE_DURATION=300
+```
 
-### Health Score Card
+3. **Import Required Components**:
+```typescript
+import { useCommunityData } from '@/hooks/useCommunityData';
+import { CommunityMetrics } from '@/types/community';
+import { BaseChart, SentimentChart } from '@/components/charts';
+```
 
-- Prominent display of Community Health Score
-- Score range: 0-100
-- Status indicators (Critical, Warning, Good)
-- Visual indicators for score changes
-- Real-time updates
+## Features & Implementation
 
-### Quick Stats Cards
+### Performance Optimizations
 
-- Total Members (e.g., "7.6K", +12% growth)
-- Active Members (e.g., "3.9K", +8% growth)
-- Messages (24h) (e.g., "8K", +15% growth)
-- Avg. Engagement (e.g., "63%", +5% growth)
-- Growth indicators with percentages
-- Visual feedback for positive/negative trends
+#### Data Fetching Strategy
+```typescript
+// hooks/useCommunityData.ts
+export function useCommunityData(options: DataOptions = {}) {
+  const { 
+    platform = 'all',
+    timeRange = '24h',
+    forceRefresh = false
+  } = options;
 
-## Core Features
+  return useSWR(
+    ['/api/community/metrics', platform, timeRange],
+    fetchWithCache,
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 60000,
+      fallbackData: getCachedData(platform, timeRange)
+    }
+  );
+}
+```
 
-### Platform Metrics Dashboard
+#### Optimized Rendering
+```typescript
+// components/charts/CommunityChart.tsx
+export function CommunityChart({ data }: Props) {
+  // Memoize expensive calculations
+  const processedData = useMemo(
+    () => processChartData(data),
+    [data]
+  );
 
-#### Top Level Metrics
+  // Prevent unnecessary re-renders
+  const ChartComponent = useMemo(
+    () => (
+      <BaseChart
+        data={processedData}
+        options={chartOptions}
+      />
+    ),
+    [processedData]
+  );
 
-- Community Health Score:
-  - Score range: 0-100
-  - Status indicators (Critical, Warning, Good)
-  - Visual indicators for score changes
-  - Real-time updates
+  return (
+    <ErrorBoundary fallback={<ChartError />}>
+      <Suspense fallback={<ChartSkeleton />}>
+        {ChartComponent}
+      </Suspense>
+    </ErrorBoundary>
+  );
+}
+```
 
-- Trending Topics:
-  - Real-time topic tracking
-  - Topic name and mention count
-  - Sentiment percentage (e.g., "85% positive")
-  - Trend direction indicators
-  - Interactive elements for detailed view
+### Data Visualization
 
-#### Sentiment Analysis
+#### Chart Configuration
+```typescript
+// config/chartConfig.ts
+export const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  animation: {
+    duration: 400,
+    easing: 'easeOutQuart'
+  },
+  plugins: {
+    legend: {
+      position: 'bottom' as const,
+      labels: {
+        color: 'rgba(255, 255, 255, 0.7)'
+      }
+    },
+    tooltip: {
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      titleColor: 'rgba(255, 255, 255, 0.9)',
+      bodyColor: 'rgba(255, 255, 255, 0.7)',
+      borderColor: 'rgba(135, 250, 253, 0.2)',
+      borderWidth: 1
+    }
+  }
+};
+```
 
-- Sentiment Trend (Stacked Area Chart):
-  - Distribution of positive/neutral/negative sentiment over time
-  - Interactive tooltips with detailed breakdowns
-  - Smooth animations and transitions
-  - Historical tracking
-  - Anomaly detection
+#### Accessibility Support
+```typescript
+// components/charts/BaseChart.tsx
+export function BaseChart({ data, options, ...props }: BaseChartProps) {
+  return (
+    <div
+      role="region"
+      aria-label={props.title}
+      className="chart-container"
+    >
+      <div className="chart-header">
+        <h2 id={`${props.id}-title`}>{props.title}</h2>
+        {props.description && (
+          <p id={`${props.id}-desc`}>{props.description}</p>
+        )}
+      </div>
+      <div
+        role="img"
+        aria-labelledby={`${props.id}-title`}
+        aria-describedby={`${props.id}-desc`}
+      >
+        <Chart
+          data={data}
+          options={{
+            ...chartOptions,
+            ...options,
+            plugins: {
+              ...chartOptions.plugins,
+              accessibility: {
+                enabled: true,
+                announceOnRender: true
+              }
+            }
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+```
 
-- Current Sentiment Distribution (Donut Chart):
-  - Current positive/neutral/negative breakdown
-  - Interactive segments with percentages
-  - Clear visual hierarchy
-  - Status indicators
-  - Trend comparisons
+## Common Tasks
 
-#### Member Growth Chart
+### 1. Add a New Metric
+```typescript
+// 1. Add type definition
+interface NewMetric {
+  value: number;
+  trend: 'up' | 'down' | 'stable';
+  change: number;
+}
 
-- Area chart with gradient effects
-- Multiple metrics overlay (Total Members, Active Members, New Members)
-- Interactive tooltips with detailed data
-- Last updated timestamp
-- Drill-down capability for hourly analysis
-- Smooth animations and transitions
+// 2. Update API response type
+interface CommunityMetrics {
+  // ... existing metrics
+  newMetric: NewMetric;
+}
 
-#### Hourly Activity Chart
+// 3. Add to UI
+function MetricCard({ metric }: { metric: NewMetric }) {
+  return (
+    <Card className="metric-card">
+      <MetricValue value={metric.value} />
+      <TrendIndicator
+        trend={metric.trend}
+        change={metric.change}
+      />
+    </Card>
+  );
+}
+```
 
-- Bar chart showing message volume by hour
-- Peak hours identification
-- Interactive tooltips
-- Responsive scaling
-- Visual patterns for activity trends
+### 2. Implement Data Export
+```typescript
+async function exportData(timeRange: string) {
+  const data = await fetchCommunityData(timeRange);
+  const csv = convertToCSV(data);
+  
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `community-data-${timeRange}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+```
 
-### Platform Integration
+## Troubleshooting
 
-- Platform-specific filters (Telegram, Discord, Twitter)
-- Cross-platform analytics
-- Unified metrics view
-- Platform-specific insights
-- Quick access to platform details
+### Common Issues
 
-### Data Export
+1. **Charts Not Rendering or Showing "No Data"**
+   - **Symptoms**:
+     - Empty charts
+     - "No Data" placeholder
+     - Blank spaces where charts should be
+   - **Solutions**:
+     ```typescript
+     // 1. Check API configuration
+     console.log(process.env.NEXT_PUBLIC_API_BASE_URL); // Should match your API
+     
+     // 2. Verify data availability
+     const { data, error } = useCommunityData();
+     console.log('Data:', data, 'Error:', error);
+     
+     // 3. Check time range validity
+     const validTimeRanges = ['24h', '7d', '30d', '90d'];
+     if (!validTimeRanges.includes(timeRange)) {
+       console.error('Invalid time range:', timeRange);
+     }
+     ```
+   - **Prevention**:
+     - Always validate environment variables during setup
+     - Implement proper loading states
+     - Add data validation before rendering
 
-- Export functionality for all metrics
-- Custom date range selection
-- Format options (CSV)
-- Metric selection
-- Platform-specific exports
+2. **Infinite Loading States**
+   - **Symptoms**:
+     - Perpetual loading spinner
+     - No error messages
+     - UI stuck in loading state
+   - **Solutions**:
+     ```typescript
+     // 1. Add timeout to useSWR
+     const { data, error } = useSWR(key, fetcher, {
+       dedupingInterval: 60000,
+       loadingTimeout: 10000,
+       onLoadingSlow: () => {
+         console.warn('Slow loading detected');
+       }
+     });
+     
+     // 2. Implement error boundaries
+     <ErrorBoundary fallback={<ErrorMessage />}>
+       <CommunityChart data={data} />
+     </ErrorBoundary>
+     ```
+   - **Prevention**:
+     - Set appropriate timeouts
+     - Implement loading fallbacks
+     - Add error boundaries
 
-## Technical Implementation
+3. **Data Not Updating with Filters**
+   - **Symptoms**:
+     - Stale data after filter changes
+     - Inconsistent updates
+     - Missing data for certain filters
+   - **Solutions**:
+     ```typescript
+     // 1. Verify dependency array
+     useEffect(() => {
+       refetch(); // Trigger manual refetch
+     }, [timeRange, platform]); // Include all filter dependencies
+     
+     // 2. Clear cache when needed
+     const handleFilterChange = () => {
+       mutate(null); // Clear cache
+       setTimeRange(newRange);
+     };
+     
+     // 3. Debug rerender triggers
+     console.log('Render:', { timeRange, platform, data });
+     ```
+   - **Prevention**:
+     - Properly manage dependencies
+     - Implement proper cache invalidation
+     - Add logging for debugging
 
-### Data Refresh
+4. **Performance Issues**
+   - **Symptoms**:
+     - Slow chart updates
+     - UI lag when filtering
+     - High memory usage
+   - **Solutions**:
+     ```typescript
+     // 1. Implement data sampling
+     const sampledData = useMemo(() => {
+       if (data.length > 1000) {
+         return data.filter((_, i) => i % 4 === 0);
+       }
+       return data;
+     }, [data]);
+     
+     // 2. Optimize rerenders
+     const MemoizedChart = memo(CommunityChart);
+     
+     // 3. Use windowing for large lists
+     import { VirtualList } from '@/components/VirtualList';
+     ```
+   - **Prevention**:
+     - Monitor performance metrics
+     - Implement data sampling
+     - Use virtualization for lists
 
-- Real-time updates
-- Configurable refresh intervals
-- Manual refresh option
-- Last updated timestamps
-- Loading state indicators
+## Contributing
 
-### Chart Configuration
+### Development Workflow
 
-- Responsive layouts optimized for all screen sizes
-- Dark theme optimized with perfect contrast ratios
-- Custom color scheme (#87fafd accent) with sophisticated gradients
-- Perfectly tuned animations and transitions:
-  - Spring-based animations for natural motion
-  - Optimized easing curves for smooth interactions
-  - Precise timing for tooltip appearances
-  - Subtle highlight states with perfect feedback
-  - Performance-optimized transform animations
-- Interactive elements with polished micro-interactions:
-  - Subtle hover states with perfect timing
-  - Clear focus indicators for accessibility
-  - Smooth highlight transitions
-  - Responsive click/tap feedback
-  - Perfect tooltip positioning
-- Accessibility features:
-  - ARIA labels for all interactive elements
-  - Screen reader announcements
-  - Keyboard navigation support
-  - Focus management
-  - Reduced motion support
+1. **Setup**
+   ```bash
+   git checkout -b feature/new-metric
+   pnpm install
+   pnpm dev
+   ```
 
-### Error Handling
+2. **Testing**
+   ```bash
+   pnpm test
+   pnpm test:coverage
+   ```
 
-- Graceful loading states
-- No data scenarios
-- Error recovery
-- Network failure handling
-- Data validation
-- User feedback
+3. **Documentation**
+   - Update relevant .md files
+   - Add JSDoc comments
+   - Include code examples
+   - Update changelog
 
-## Accessibility
+4. **Pull Request**
+   - Follow PR template
+   - Include screenshots/videos
+   - Add test coverage
+   - Update documentation
 
-### Visual Design
+## Maintenance Guidelines
 
-- High contrast elements
-- Clear visual hierarchy
-- Consistent spacing
-- Color blind friendly
-- Mobile responsive
-- Dark theme optimized
+### Documentation Updates
+1. **When to Update**:
+   - Adding new features or components
+   - Modifying existing functionality
+   - Fixing bugs that affect usage
+   - Updating dependencies
+   - Adding new best practices
 
-### Interactive Elements
+2. **Review Process**:
+   - Documentation changes require PR review
+   - Include screenshots/videos for visual changes
+   - Update all affected documentation files
+   - Run spell-checker and grammar checker
+   - Verify all code examples are working
+   - Update version numbers and changelog
 
-- Keyboard navigation
-- Focus indicators
-- ARIA labels
-- Screen reader support
-- Tooltips
-- Status announcements
+3. **Quality Checklist**:
+   - [ ] Code examples are complete and runnable
+   - [ ] All imports are specified
+   - [ ] Type definitions are included
+   - [ ] Examples follow project code style
+   - [ ] Links are valid and up-to-date
+   - [ ] Screenshots match current UI
+   - [ ] Changelog is updated
+   - [ ] Version numbers are correct
 
-## Best Practices
-
-### Data Analysis
-
-1. Monitor health score trends
-2. Investigate anomalies
-3. Cross-reference metrics
-4. Track platform-specific patterns
-5. Analyze peak hours
-6. Review sentiment changes
-7. Document significant trends
-
-### Performance
-
-1. Regular data refresh
-2. Efficient loading
-3. Responsive design
-4. Cache management
-5. Error handling
-6. User feedback
-
-## Version History
-
-See CHANGELOG.md for detailed version history and updates.
+4. **Regular Maintenance**:
+   - Assign documentation owner for each sprint
+   - Schedule quarterly documentation audits
+   - Review and update troubleshooting section
+   - Verify all examples with latest dependencies
+   - Update performance recommendations
+   - Refresh screenshots and examples

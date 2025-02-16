@@ -3,8 +3,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
-  PlusIcon,
-  FunnelIcon,
   ChatBubbleLeftRightIcon,
   UserGroupIcon,
   RocketLaunchIcon,
@@ -13,7 +11,6 @@ import {
   PaperAirplaneIcon,
   Squares2X2Icon,
   ListBulletIcon,
-  CircleStackIcon,
   CpuChipIcon,
 } from '@heroicons/react/24/outline';
 import { DiscordLogoIcon, TwitterLogoIcon } from '@radix-ui/react-icons';
@@ -104,7 +101,7 @@ export default function AgentsPage() {
   ];
 
   // Create a reusable avatar component
-  const AgentAvatar = ({ agent }: { agent: (typeof agents)[0] }) => (
+  const AgentAvatar = ({ _agent }: { _agent: (typeof agents)[0] }) => (
     <div className="relative w-12 h-12 shrink-0">
       <div className="absolute inset-0 rounded-full ring-2 ring-white/10" />
       <div className="absolute inset-0 rounded-full overflow-hidden bg-accent/10 flex items-center justify-center">
@@ -216,7 +213,7 @@ export default function AgentsPage() {
                     className="p-6 rounded-xl bg-white/5 border border-white/10 hover:border-accent/50 transition-colors"
                   >
                     <div className="flex items-start space-x-3 mb-6">
-                      <AgentAvatar agent={agent} />
+                      <AgentAvatar _agent={agent} />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between">
                           <h3 className="text-lg font-medium text-white truncate pr-2">
@@ -286,7 +283,7 @@ export default function AgentsPage() {
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
-                        <AgentAvatar agent={agent} />
+                        <AgentAvatar _agent={agent} />
                         <div>
                           <h3 className="text-lg font-medium text-white">{agent.name}</h3>
                           <p className="text-white/50 text-sm">{agent.description}</p>

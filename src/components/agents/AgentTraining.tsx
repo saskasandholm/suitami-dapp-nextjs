@@ -20,21 +20,15 @@ interface TrainingMetrics {
 }
 
 interface AgentTrainingProps {
-  agentId: string;
   agentName: string;
   trainingStatus: 'in_progress' | 'completed' | 'not_started';
-  currentEpoch?: number;
   totalEpochs?: number;
-  metrics?: TrainingMetrics[];
 }
 
 export default function AgentTraining({ 
-  agentId, 
   agentName, 
   trainingStatus,
-  currentEpoch = 0,
-  totalEpochs = 100,
-  metrics = []
+  totalEpochs = 100
 }: AgentTrainingProps) {
   // Simulated training metrics
   const [trainingMetrics, setTrainingMetrics] = useState<TrainingMetrics[]>([]);

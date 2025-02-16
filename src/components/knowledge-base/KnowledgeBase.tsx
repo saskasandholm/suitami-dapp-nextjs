@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, Title, Text } from '@tremor/react';
 import { DocumentIcon, LinkIcon, QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
 import KnowledgeBaseDocumentsPanel from './KnowledgeBaseDocumentsPanel';
 import KnowledgeBaseURLsPanel from './KnowledgeBaseURLsPanel';

@@ -75,6 +75,17 @@ interface AgentAction {
   }[];
 }
 
+interface TrainingConfiguration {
+  learningRate: number;
+  batchSize: number;
+  epochs: number;
+  optimizer: string;
+  lossFunction: string;
+  modelArchitecture: string;
+  datasetSize: number;
+  validationSplit: number;
+}
+
 // Mock data for recent actions
 const mockRecentActions: AgentAction[] = [
   {
@@ -347,7 +358,7 @@ export default function TrainingCenter() {
     );
   };
 
-  const handleConfigUpdate = (config: any) => {
+  const handleConfigUpdate = (config: TrainingConfiguration) => {
     // In a real app, this would update the training configuration
     console.log('Training config updated:', config);
   };

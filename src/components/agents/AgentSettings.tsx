@@ -7,14 +7,12 @@ import { UserCircleIcon, PhotoIcon, CheckCircleIcon } from '@heroicons/react/24/
 import Image from 'next/image';
 
 interface AgentSettingsProps {
-  agentId: string;
   initialName: string;
   initialAvatar?: string;
   onUpdate: (data: { name: string; avatar?: File }) => void;
 }
 
 export default function AgentSettings({
-  agentId,
   initialName,
   initialAvatar,
   onUpdate,

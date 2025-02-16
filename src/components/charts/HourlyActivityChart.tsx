@@ -3,22 +3,28 @@ import { motion } from 'framer-motion';
 import { ClockIcon } from '@heroicons/react/24/outline';
 import { useState, useMemo } from 'react';
 import BaseChart, { chartStyles, InsightType } from './BaseChart';
-import CustomTooltip from './CustomTooltip';
+import CustomTooltip from '@/components/common/CustomTooltip';
 import { formatValue } from '@/utils/formatters';
-import type { EventProps } from '@tremor/react';
 
-interface HourlyData {
+interface HourlyActivityData {
   hour: string;
   messages: number;
   reactions: number;
   threads: number;
 }
 
+type HighlightedDataKey = 'messages' | 'reactions' | 'threads' | 'hour' | 'category' | string;
+
+interface HighlightedData {
+  key: HighlightedDataKey;
+  value: string;
+}
+
 interface HourlyActivityChartProps {
-  data: HourlyData[];
+  data: HourlyActivityData[];
   selectedDate: string;
-  onHighlightChange?: (highlight: { key: string; value: any } | null) => void;
-  highlightedData?: { key: string; value: any };
+  onHighlightChange?: (highlight: HighlightedData) => void;
+  highlightedData?: HighlightedData;
   chartId?: string;
 }
 
@@ -154,7 +160,7 @@ export default function HourlyActivityChart({
       onHighlightChange?.(insight.highlightData);
     } else {
       setHighlightedHour(null);
-      onHighlightChange?.(null);
+      onHighlightChange?.({ key: '', value: '' });
     }
   };
 
@@ -273,7 +279,7 @@ export default function HourlyActivityChart({
               onHighlightChange?.({ key: 'hour', value: String(v.hour) });
             } else {
               setHighlightedHour(null);
-              onHighlightChange?.(null);
+              onHighlightChange?.({ key: '', value: '' });
             }
           }}
           customTooltip={CustomTooltip}

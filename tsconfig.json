@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es2017",
+    "target": "es5",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -21,8 +21,7 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "baseUrl": ".",
-    "types": ["react", "react-dom", "node", "jest"],
+    "types": ["jest", "node"],
     "noImplicitAny": true,
     "noImplicitThis": true,
     "strictNullChecks": true,

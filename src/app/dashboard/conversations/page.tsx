@@ -5,11 +5,6 @@ import {
   Card,
   Title,
   Text,
-  Tab,
-  TabList,
-  TabGroup,
-  TabPanel,
-  TabPanels,
   Badge,
 } from '@tremor/react';
 import { motion } from 'framer-motion';
@@ -21,6 +16,7 @@ import {
   TagIcon,
   ChartBarIcon,
 } from '@heroicons/react/24/outline';
+import PageHeader from '@/components/layout/PageHeader';
 
 interface Message {
   id: string;
@@ -87,36 +83,36 @@ export default function ConversationsPage() {
 
   return (
     <div className="space-y-8">
-      <div className="page-header">
-        <div>
-          <h1 className="page-title">Conversations</h1>
-          <p className="page-description">Monitor and analyze community interactions</p>
-        </div>
-        <div className="flex space-x-4">
-          <select
-            className="bg-black/20 border border-white/10 rounded-lg px-4 py-2 text-white focus:border-accent focus:ring-1 focus:ring-accent outline-none"
-            value={selectedCategory}
-            onChange={e => setSelectedCategory(e.target.value)}
-          >
-            {categories.map(category => (
-              <option key={category} value={category}>
-                {category}
-              </option>
-            ))}
-          </select>
-          <select
-            className="bg-black/20 border border-white/10 rounded-lg px-4 py-2 text-white focus:border-accent focus:ring-1 focus:ring-accent outline-none"
-            value={selectedPlatform}
-            onChange={e => setSelectedPlatform(e.target.value)}
-          >
-            {platforms.map(platform => (
-              <option key={platform} value={platform}>
-                {platform}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
+      <PageHeader
+        title="Conversations"
+        description="Monitor and analyze community interactions"
+        rightContent={
+          <div className="flex space-x-4">
+            <select
+              className="bg-black/20 border border-white/10 rounded-lg px-4 py-2 text-white focus:border-accent focus:ring-1 focus:ring-accent outline-none"
+              value={selectedCategory}
+              onChange={e => setSelectedCategory(e.target.value)}
+            >
+              {categories.map(category => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+            <select
+              className="bg-black/20 border border-white/10 rounded-lg px-4 py-2 text-white focus:border-accent focus:ring-1 focus:ring-accent outline-none"
+              value={selectedPlatform}
+              onChange={e => setSelectedPlatform(e.target.value)}
+            >
+              {platforms.map(platform => (
+                <option key={platform} value={platform}>
+                  {platform}
+                </option>
+              ))}
+            </select>
+          </div>
+        }
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {[
