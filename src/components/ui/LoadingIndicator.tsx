@@ -6,19 +6,19 @@ interface LoadingIndicatorProps {
   className?: string;
 }
 
+const sizeClasses = {
+  sm: 'w-4 h-4',
+  md: 'w-6 h-6',
+  lg: 'w-8 h-8',
+};
+
 export default function LoadingIndicator({ 
   text, 
   size = 'md',
   className = ''
 }: LoadingIndicatorProps) {
-  const sizeClasses = {
-    sm: 'w-4 h-4',
-    md: 'w-6 h-6',
-    lg: 'w-8 h-8'
-  };
-
   return (
-    <div className={`flex items-center space-x-2 ${className}`}>
+    <div className={`flex items-center space-x-2 ${className}`} role="status">
       <motion.div
         className={`${sizeClasses[size]} border-2 border-accent border-t-transparent rounded-full`}
         animate={{ rotate: 360 }}

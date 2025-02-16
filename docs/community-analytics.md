@@ -34,6 +34,37 @@ The Community Analytics page provides comprehensive insights into community enga
 
 ### Platform Metrics Dashboard
 
+#### Top Level Metrics
+
+- Community Health Score:
+  - Score range: 0-100
+  - Status indicators (Critical, Warning, Good)
+  - Visual indicators for score changes
+  - Real-time updates
+
+- Trending Topics:
+  - Real-time topic tracking
+  - Topic name and mention count
+  - Sentiment percentage (e.g., "85% positive")
+  - Trend direction indicators
+  - Interactive elements for detailed view
+
+#### Sentiment Analysis
+
+- Sentiment Trend (Stacked Area Chart):
+  - Distribution of positive/neutral/negative sentiment over time
+  - Interactive tooltips with detailed breakdowns
+  - Smooth animations and transitions
+  - Historical tracking
+  - Anomaly detection
+
+- Current Sentiment Distribution (Donut Chart):
+  - Current positive/neutral/negative breakdown
+  - Interactive segments with percentages
+  - Clear visual hierarchy
+  - Status indicators
+  - Trend comparisons
+
 #### Member Growth Chart
 
 - Area chart with gradient effects
@@ -50,22 +81,6 @@ The Community Analytics page provides comprehensive insights into community enga
 - Interactive tooltips
 - Responsive scaling
 - Visual patterns for activity trends
-
-#### Community Sentiment
-
-- Area chart showing sentiment trends
-- Positive/Negative trend indicators
-- Score-based visualization
-- Historical tracking
-- Anomaly detection
-
-#### Trending Topics
-
-- Real-time topic tracking
-- Topic name and mention count
-- Sentiment percentage (e.g., "85% positive")
-- Trend direction indicators
-- Interactive elements for detailed view
 
 ### Platform Integration
 
@@ -95,13 +110,27 @@ The Community Analytics page provides comprehensive insights into community enga
 
 ### Chart Configuration
 
-- Responsive layouts
-- Dark theme optimized
-- Custom color scheme (#87fafd accent)
-- Gradient backgrounds
-- Drop shadows for depth
-- Interactive elements
-- Smooth animations
+- Responsive layouts optimized for all screen sizes
+- Dark theme optimized with perfect contrast ratios
+- Custom color scheme (#87fafd accent) with sophisticated gradients
+- Perfectly tuned animations and transitions:
+  - Spring-based animations for natural motion
+  - Optimized easing curves for smooth interactions
+  - Precise timing for tooltip appearances
+  - Subtle highlight states with perfect feedback
+  - Performance-optimized transform animations
+- Interactive elements with polished micro-interactions:
+  - Subtle hover states with perfect timing
+  - Clear focus indicators for accessibility
+  - Smooth highlight transitions
+  - Responsive click/tap feedback
+  - Perfect tooltip positioning
+- Accessibility features:
+  - ARIA labels for all interactive elements
+  - Screen reader announcements
+  - Keyboard navigation support
+  - Focus management
+  - Reduced motion support
 
 ### Error Handling
 

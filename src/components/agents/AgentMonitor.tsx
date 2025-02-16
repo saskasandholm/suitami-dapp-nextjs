@@ -11,9 +11,9 @@ import {
 } from "@heroicons/react/24/outline";
 
 interface AgentMetrics {
-  responseTime: number[];
-  accuracy: number[];
-  uptime: number;
+  responseTimeMs: number[];
+  accuracyPercent: number[];
+  uptimePercent: number;
   status: 'online' | 'offline' | 'training';
   messagesHandled: number;
   timestamps: string[];
@@ -28,11 +28,11 @@ interface AgentMonitorProps {
 export default function AgentMonitor({ agentId, agentName, platform }: AgentMonitorProps) {
   // In a real app, this would be fetched from an API
   const [metrics, setMetrics] = useState<AgentMetrics>({
-    responseTime: [250, 245, 290, 280, 260, 245, 255],
-    accuracy: [92, 94, 91, 95, 93, 94, 96],
-    uptime: 99.9,
+    responseTimeMs: [250, 245, 260, 255, 240, 235],
+    accuracyPercent: [92, 93, 91, 94, 92, 93],
+    uptimePercent: 99.9,
     status: 'online',
-    messagesHandled: 1234,
+    messagesHandled: 1250,
     timestamps: [
       '12:00',
       '12:10',
@@ -46,22 +46,22 @@ export default function AgentMonitor({ agentId, agentName, platform }: AgentMoni
 
   // Simulate real-time updates
   useEffect(() => {
-    const interval = setInterval(() => {
-      setMetrics(prev => ({
-        ...prev,
-        responseTime: [...prev.responseTime.slice(1), Math.random() * 50 + 230],
-        accuracy: [...prev.accuracy.slice(1), Math.random() * 6 + 90],
-        messagesHandled: prev.messagesHandled + Math.floor(Math.random() * 5),
+    const updateInterval = setInterval(() => {
+      setMetrics(prevMetrics => ({
+        ...prevMetrics,
+        responseTimeMs: [...prevMetrics.responseTimeMs.slice(1), Math.random() * 50 + 230],
+        accuracyPercent: [...prevMetrics.accuracyPercent.slice(1), Math.random() * 6 + 90],
+        messagesHandled: prevMetrics.messagesHandled + Math.floor(Math.random() * 5),
       }));
     }, 5000);
 
-    return () => clearInterval(interval);
+    return () => clearInterval(updateInterval);
   }, []);
 
   const performanceData = metrics.timestamps.map((timestamp, index) => ({
     timestamp,
-    "Response Time (ms)": metrics.responseTime[index],
-    "Accuracy (%)": metrics.accuracy[index],
+    "Response Time (ms)": metrics.responseTimeMs[index],
+    "Accuracy (%)": metrics.accuracyPercent[index],
   }));
 
   return (
@@ -96,7 +96,7 @@ export default function AgentMonitor({ agentId, agentName, platform }: AgentMoni
             <Text className="text-white/70">Response Time</Text>
           </div>
           <Metric className="text-white mt-2">
-            {metrics.responseTime[metrics.responseTime.length - 1].toFixed(0)} ms
+            {metrics.responseTimeMs[metrics.responseTimeMs.length - 1].toFixed(0)} ms
           </Metric>
         </Card>
 
@@ -106,7 +106,7 @@ export default function AgentMonitor({ agentId, agentName, platform }: AgentMoni
             <Text className="text-white/70">Accuracy</Text>
           </div>
           <Metric className="text-white mt-2">
-            {metrics.accuracy[metrics.accuracy.length - 1].toFixed(1)}%
+            {metrics.accuracyPercent[metrics.accuracyPercent.length - 1].toFixed(1)}%
           </Metric>
         </Card>
 
@@ -115,7 +115,7 @@ export default function AgentMonitor({ agentId, agentName, platform }: AgentMoni
             <ClockIcon className="w-4 h-4 text-accent" />
             <Text className="text-white/70">Uptime</Text>
           </div>
-          <Metric className="text-white mt-2">{metrics.uptime}%</Metric>
+          <Metric className="text-white mt-2">{metrics.uptimePercent}%</Metric>
         </Card>
       </div>
 

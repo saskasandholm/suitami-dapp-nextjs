@@ -312,8 +312,8 @@ export default function TrainingCenter() {
   };
 
   const startTraining = (agentId: string) => {
-    setAgents(prev =>
-      prev.map(agent =>
+    setAgents(prev => 
+      prev.map(agent => 
         agent.id === agentId
           ? {
               ...agent,
@@ -331,8 +331,8 @@ export default function TrainingCenter() {
   };
 
   const stopTraining = (agentId: string) => {
-    setAgents(prev =>
-      prev.map(agent =>
+    setAgents(prev => 
+      prev.map(agent => 
         agent.id === agentId
           ? {
               ...agent,
@@ -713,54 +713,54 @@ export default function TrainingCenter() {
           <TabPanel>
             {/* Advanced Training View */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-              {agents.map((agent, index) => (
-                <motion.div
-                  key={agent.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <Card
-                    className={`glass-card hover-accent cursor-pointer ${
-                      selectedAgent?.id === agent.id ? 'border-accent' : ''
-                    }`}
-                    onClick={() => setSelectedAgent(agent)}
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center">
-                        <div className="w-12 h-12 rounded-full bg-[#87fafd]/10 flex items-center justify-center mr-4 overflow-hidden">
-                          {agent.avatar ? (
+        {agents.map((agent, index) => (
+          <motion.div
+            key={agent.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+          >
+            <Card 
+              className={`glass-card hover-accent cursor-pointer ${
+                selectedAgent?.id === agent.id ? 'border-accent' : ''
+              }`}
+              onClick={() => setSelectedAgent(agent)}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center">
+                  <div className="w-12 h-12 rounded-full bg-[#87fafd]/10 flex items-center justify-center mr-4 overflow-hidden">
+                    {agent.avatar ? (
                             <Image
-                              src={agent.avatar}
-                              alt={agent.name}
+                        src={agent.avatar} 
+                        alt={agent.name}
                               width={48}
                               height={48}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <CommandLineIcon className="w-6 h-6 text-accent" />
-                          )}
-                        </div>
-                        <div>
-                          <Title className="text-white">{agent.name}</Title>
-                          <Text className="text-white/70">{agent.type}</Text>
-                        </div>
-                      </div>
-                      <Badge
-                        className={`${
-                          agent.status === 'completed'
-                            ? 'bg-green-400/10 text-green-400'
-                            : agent.status === 'in_progress'
-                              ? 'bg-yellow-400/10 text-yellow-400'
-                              : 'bg-white/10 text-white/70'
-                        }`}
-                      >
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <CommandLineIcon className="w-6 h-6 text-accent" />
+                    )}
+                  </div>
+                  <div>
+                    <Title className="text-white">{agent.name}</Title>
+                    <Text className="text-white/70">{agent.type}</Text>
+                  </div>
+                </div>
+                <Badge
+                  className={`${
+                    agent.status === 'completed'
+                      ? 'bg-green-400/10 text-green-400'
+                      : agent.status === 'in_progress'
+                      ? 'bg-yellow-400/10 text-yellow-400'
+                      : 'bg-white/10 text-white/70'
+                  }`}
+                >
                         {agent.status
                           .split('_')
                           .map(word => word.charAt(0).toUpperCase() + word.slice(1))
                           .join(' ')}
-                      </Badge>
-                    </div>
+                </Badge>
+              </div>
 
                     {agent.trainingProgress && (
                       <div className="mb-4">
@@ -805,43 +805,43 @@ export default function TrainingCenter() {
                       </div>
                     )}
 
-                    <div className="flex items-center justify-between">
-                      <Text className="text-white/70">Platform: {agent.platform}</Text>
-                      {agent.status === 'not_started' && (
-                        <button
+              <div className="flex items-center justify-between">
+                <Text className="text-white/70">Platform: {agent.platform}</Text>
+                {agent.status === 'not_started' && (
+                  <button
                           onClick={e => {
-                            e.stopPropagation();
-                            startTraining(agent.id);
-                          }}
-                          className="button-primary flex items-center text-sm px-3 py-1"
-                        >
-                          <PlayIcon className="w-4 h-4 mr-1" />
-                          Start Training
-                        </button>
-                      )}
-                      {agent.status === 'in_progress' && (
-                        <button
+                      e.stopPropagation();
+                      startTraining(agent.id);
+                    }}
+                    className="button-primary flex items-center text-sm px-3 py-1"
+                  >
+                    <PlayIcon className="w-4 h-4 mr-1" />
+                    Start Training
+                  </button>
+                )}
+                {agent.status === 'in_progress' && (
+                  <button
                           onClick={e => {
-                            e.stopPropagation();
-                            stopTraining(agent.id);
-                          }}
-                          className="button-primary flex items-center text-sm px-3 py-1 bg-red-500/20 hover:bg-red-500/30 border-red-500/30"
-                        >
-                          <StopIcon className="w-4 h-4 mr-1" />
-                          Stop Training
-                        </button>
-                      )}
-                    </div>
-                  </Card>
-                </motion.div>
-              ))}
-            </div>
+                      e.stopPropagation();
+                      stopTraining(agent.id);
+                    }}
+                    className="button-primary flex items-center text-sm px-3 py-1 bg-red-500/20 hover:bg-red-500/30 border-red-500/30"
+                  >
+                    <StopIcon className="w-4 h-4 mr-1" />
+                    Stop Training
+                  </button>
+                )}
+              </div>
+            </Card>
+          </motion.div>
+        ))}
+      </div>
 
-            {selectedAgent && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
+      {selectedAgent && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
                 className="space-y-8"
               >
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -892,15 +892,15 @@ export default function TrainingCenter() {
                       </div>
 
                       <button className="button-primary w-full mt-4">Add Knowledge Source</button>
-                    </div>
+                </div>
                   </Card>
                 </div>
                 <TrainingHistory agentId={selectedAgent.id} />
               </motion.div>
             )}
-          </TabPanel>
-        </TabPanels>
-      </TabGroup>
+              </TabPanel>
+            </TabPanels>
+          </TabGroup>
     </div>
   );
-}
+} 

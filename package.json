@@ -1,6 +1,6 @@
 {
   "name": "suitami-dapp-nextjs",
-  "version": "0.11.9",
+  "version": "0.13.7",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3333",
@@ -9,33 +9,42 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "format": "prettier --write .",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "analyze": "ANALYZE=true next build",
+    "validate": "npm-run-all --parallel type-check lint"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.2.0",
     "@radix-ui/react-icons": "^1.3.2",
     "@tremor/react": "^3.18.7",
+    "critters": "^0.0.25",
     "framer-motion": "^12.4.2",
     "next": "14.1.0",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "sharp": "^0.33.5"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^14.1.0",
+    "@next/eslint-plugin-next": "^15.1.7",
+    "@types/chart.js": "^2.9.41",
     "@types/node": "^20.17.17",
-    "@types/react": "^19.0.8",
-    "@types/react-dom": "^19.0.3",
-    "@typescript-eslint/eslint-plugin": "^6.19.0",
-    "@typescript-eslint/parser": "^6.19.0",
+    "@types/react": "^18.2.55",
+    "@types/react-dom": "^18.2.19",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
     "autoprefixer": "^10.0.1",
     "eslint": "^8",
     "eslint-config-next": "14.1.0",
+    "eslint-plugin-import": "^2.29.1",
     "husky": "^8.0.0",
     "lint-staged": "^15.4.3",
+    "npm-run-all": "^4.1.5",
     "postcss": "^8",
     "prettier": "^3.5.1",
     "tailwindcss": "^3.3.0",
-    "typescript": "^5"
+    "typescript": "~5.3.3"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [

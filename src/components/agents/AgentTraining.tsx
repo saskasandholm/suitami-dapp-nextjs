@@ -41,11 +41,13 @@ export default function AgentTraining({
   const [isTraining, setIsTraining] = useState(trainingStatus === 'in_progress');
 
   useEffect(() => {
+    let interval: NodeJS.Timeout | undefined;
+    
     if (isTraining) {
-      const interval = setInterval(() => {
+      interval = setInterval(() => {
         setTrainingMetrics(prev => {
           if (prev.length >= totalEpochs) {
-            clearInterval(interval);
+            if (interval) clearInterval(interval);
             setIsTraining(false);
             return prev;
           }
@@ -63,9 +65,11 @@ export default function AgentTraining({
           }];
         });
       }, 1000);
-
-      return () => clearInterval(interval);
     }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
   }, [isTraining, totalEpochs]);
 
   const chartData = trainingMetrics.map(metric => ({
