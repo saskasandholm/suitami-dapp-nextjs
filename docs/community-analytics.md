@@ -564,3 +564,119 @@ async function exportData(timeRange: string) {
    - Verify all examples with latest dependencies
    - Update performance recommendations
    - Refresh screenshots and examples
+
+## Mock Data Generation
+
+### Hourly Activity Configuration
+
+The mock data generation system supports detailed configuration of hourly activity patterns through the API. This is particularly useful for testing and development.
+
+```typescript
+interface HourlyActivityConfig {
+  timezone?: string; // e.g., 'America/New_York'
+  activityRanges?: {
+    messages: { min: number; max: number };
+    reactions: { min: number; max: number };
+    threads: { min: number; max: number };
+  };
+  peakHours?: {
+    weekday: number[]; // Array of peak hours (0-23)
+    weekend: number[]; // Array of peak hours (0-23)
+  };
+  activityMultipliers?: {
+    night: number; // 00:00-06:59
+    morning: number; // 07:00-08:59
+    peak: number; // Peak hours
+    evening: number; // 18:00-23:59
+  };
+  dayOfWeekVariations?: {
+    weekday: number; // Base multiplier for weekdays
+    weekend: number; // Base multiplier for weekends
+  };
+  eventSimulation?: {
+    probability: number; // 0-1
+    magnitude: number; // 1-5
+    duration: number; // 1-4 hours
+    types: ('ama' | 'launch' | 'announcement' | 'incident')[];
+  };
+  seed?: number; // For reproducible generation
+}
+```
+
+### Example Usage
+
+```typescript
+// Basic usage with default configuration
+const response = await fetch('/api/community');
+const data = await response.json();
+
+// Custom configuration
+const config = {
+  timezone: 'America/New_York',
+  peakHours: {
+    weekday: [10, 11, 12, 13, 14],
+    weekend: [14, 15, 16, 17],
+  },
+  eventSimulation: {
+    probability: 0.2,
+    magnitude: 2.5,
+    duration: 2,
+    types: ['ama', 'launch'],
+  },
+};
+
+const response = await fetch(
+  '/api/community?' +
+    new URLSearchParams({
+      hourlyActivityConfig: JSON.stringify(config),
+    })
+);
+const data = await response.json();
+```
+
+### Error Handling
+
+The API provides detailed error messages for invalid configurations:
+
+```typescript
+// Invalid configuration example
+const invalidConfig = {
+  activityRanges: {
+    messages: { min: 100, max: 50 } // Invalid: min > max
+  }
+};
+
+// API will return a 400 error with details:
+{
+  error: "Invalid hourlyActivityConfig: Validation failed",
+  details: {
+    errors: ["Messages range: minimum must be less than maximum"],
+    providedConfig: invalidConfig
+  }
+}
+```
+
+### Best Practices
+
+1. **Activity Ranges**
+
+   - Keep ranges realistic (e.g., threads < messages)
+   - Maintain logical relationships between metrics
+   - Use appropriate ranges for your community size
+
+2. **Time-based Configuration**
+
+   - Set peak hours based on your community's timezone
+   - Adjust multipliers for your activity patterns
+   - Consider weekday/weekend variations
+
+3. **Event Simulation**
+
+   - Use realistic event probabilities
+   - Set appropriate event durations
+   - Choose relevant event types
+
+4. **Data Validation**
+   - Always validate configuration before sending
+   - Handle API errors gracefully
+   - Log validation failures for debugging

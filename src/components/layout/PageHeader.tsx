@@ -1,7 +1,7 @@
 /**
  * PageHeader is a reusable component that provides a consistent header pattern across dashboard pages.
  * It includes animations powered by Framer Motion for smooth transitions when the page loads.
- * 
+ *
  * @component
  * @example
  * ```tsx
@@ -35,41 +35,41 @@ export default function PageHeader({
   title,
   description,
   rightContent,
-  className = ''
+  className = '',
 }: PageHeaderProps) {
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{
-        type: "spring",
+        type: 'spring',
         stiffness: 260,
-        damping: 20
+        damping: 20,
       }}
-      className={`page-header ${className}`}
+      className={`flex justify-between items-center pl-8 pt-8 mb-8 ${className}`}
     >
       <div>
-        <motion.h1 
+        <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{
-            type: "spring",
+            type: 'spring',
             stiffness: 260,
-            damping: 20
+            damping: 20,
           }}
           className="page-title"
         >
           {title}
         </motion.h1>
         {description && (
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ 
-              type: "spring",
+            transition={{
+              type: 'spring',
               stiffness: 260,
               damping: 20,
-              delay: 0.1 
+              delay: 0.1,
             }}
             className="page-description"
           >
@@ -81,11 +81,11 @@ export default function PageHeader({
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ 
-            type: "spring",
+          transition={{
+            type: 'spring',
             stiffness: 260,
             damping: 20,
-            delay: 0.2 
+            delay: 0.2,
           }}
         >
           {rightContent}
@@ -93,4 +93,4 @@ export default function PageHeader({
       )}
     </motion.div>
   );
-} 
+}

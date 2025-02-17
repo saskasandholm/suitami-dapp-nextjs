@@ -15,6 +15,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { DiscordLogoIcon, TwitterLogoIcon } from '@radix-ui/react-icons';
 import { useRouter } from 'next/navigation';
+import PageHeader from '@/components/layout/PageHeader';
 
 export default function AgentsPage() {
   const router = useRouter();
@@ -115,20 +116,20 @@ export default function AgentsPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto">
-      <div className="page-header">
-        <div>
-          <h1 className="page-title">My Agents</h1>
-          <p className="page-description">Manage and monitor your AI agents</p>
-        </div>
-        <button
-          onClick={() => setShowDeployModal(true)}
-          className="button-deploy flex items-center px-4 py-2"
-        >
-          <CommandLineIcon className="w-5 h-5 mr-2" />
-          Deploy New Agent
-        </button>
-      </div>
+    <div className="space-y-8">
+      <PageHeader
+        title="My Agents"
+        description="Manage and monitor your AI agents"
+        rightContent={
+          <button
+            onClick={() => setShowDeployModal(true)}
+            className="button-deploy flex items-center px-4 py-2"
+          >
+            <CommandLineIcon className="w-5 h-5 mr-2" />
+            Deploy New Agent
+          </button>
+        }
+      />
 
       <div className="glass-card">
         <div className="p-4 border-b border-white/10">

@@ -1,4 +1,15 @@
-import type { CommunityMetrics, SentimentData, TrendingTopic } from '@/types/community';
+import type {
+  PlatformMetrics,
+  SentimentData,
+  TrendingTopic,
+  HourlyActivityConfig,
+} from '@/types/community';
+import {
+  generateMockAllPlatformMetrics,
+  generateMockPlatformMetrics,
+  generateMockSentimentData,
+  generateMockTrendingTopics,
+} from '@/mocks/communityMockData';
 
 // Cache configuration
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
@@ -12,6 +23,12 @@ interface CacheEntry<T> {
 interface CacheConfig {
   duration?: number;
   forceRefresh?: boolean;
+}
+
+interface CommunityDataParams {
+  timeRange?: string;
+  platform?: string;
+  hourlyActivityConfig?: HourlyActivityConfig;
 }
 
 // Cache utility functions
@@ -96,33 +113,49 @@ async function fetchWithErrorHandling<T>(url: string, options?: RequestInit): Pr
 export async function fetchCommunityMetrics(
   platform: string,
   timeRange: string,
-  config?: CacheConfig
-): Promise<CommunityMetrics> {
-  const cacheKey = getCacheKey('metrics', { platform, timeRange });
-  const cached = getCache<CommunityMetrics>(cacheKey, config);
-  if (cached) return cached;
+  config?: CacheConfig & { hourlyActivityConfig?: HourlyActivityConfig }
+): Promise<PlatformMetrics> {
+  console.log('fetchCommunityMetrics called:', { platform, timeRange, config });
 
   try {
-    const response = await fetch(
-      `/api/community/metrics?platform=${platform}&timeRange=${timeRange}`
-    );
-    if (!response.ok) {
-      throw new ApiError(response.status, `API request failed: ${response.statusText}`);
+    const cacheKey = getCacheKey('metrics', { platform, timeRange });
+    const cached = getCache<PlatformMetrics>(cacheKey, config);
+    if (cached) {
+      console.log('Returning cached metrics data');
+      return cached;
     }
 
-    const data = await response.json();
-    if (!data || !data.sentiment || !data.engagement || !data.growth) {
-      console.error('Invalid metrics data:', data);
-      throw new ApiError(400, 'Invalid metrics data: Missing required fields');
+    // Construct URL with query parameters
+    const url = new URL(BASE_URL, window.location.origin);
+    url.searchParams.set('platform', platform);
+    url.searchParams.set('timeRange', timeRange);
+    if (config?.hourlyActivityConfig) {
+      url.searchParams.set('hourlyActivityConfig', JSON.stringify(config.hourlyActivityConfig));
     }
 
-    setCache(cacheKey, data);
-    return data;
+    // Fetch data from API
+    const response = await fetchWithErrorHandling<{
+      metrics: PlatformMetrics;
+      sentiment: SentimentData[];
+      topics: TrendingTopic[];
+      hourlyActivity: any[];
+    }>(url.toString());
+
+    if (!response.metrics) {
+      throw new Error('Invalid response: Missing metrics data');
+    }
+
+    // Cache and return metrics
+    setCache(cacheKey, response.metrics);
+    return response.metrics;
   } catch (error) {
-    console.error('Error fetching community metrics:', error);
+    console.error('Error in fetchCommunityMetrics:', error);
     throw error instanceof ApiError
       ? error
-      : new ApiError(500, 'Failed to fetch metrics: Network error');
+      : new ApiError(
+          500,
+          `Failed to fetch metrics: ${error instanceof Error ? error.message : 'Unknown error'}`
+        );
   }
 }
 
@@ -130,28 +163,86 @@ export async function fetchSentimentData(
   timeRange: string,
   config?: CacheConfig
 ): Promise<SentimentData[]> {
-  const cacheKey = getCacheKey('sentiment', { timeRange });
-  const cached = getCache<SentimentData[]>(cacheKey, config);
-  if (cached) return cached;
+  console.log('fetchSentimentData called:', { timeRange, config });
 
-  const url = `${BASE_URL}/sentiment?timeRange=${timeRange}`;
-  const data = await fetchWithErrorHandling<SentimentData[]>(url);
-  setCache(cacheKey, data);
-  return data;
+  try {
+    const cacheKey = getCacheKey('sentiment', { timeRange });
+    const cached = getCache<SentimentData[]>(cacheKey, config);
+    if (cached) {
+      console.log('Returning cached sentiment data');
+      return cached;
+    }
+
+    // Construct URL with query parameters
+    const url = new URL(BASE_URL, window.location.origin);
+    url.searchParams.set('timeRange', timeRange);
+
+    // Fetch data from API
+    const response = await fetchWithErrorHandling<{
+      metrics: PlatformMetrics;
+      sentiment: SentimentData[];
+      topics: TrendingTopic[];
+    }>(url.toString());
+
+    if (!response.sentiment) {
+      throw new Error('Invalid response: Missing sentiment data');
+    }
+
+    // Cache and return sentiment data
+    setCache(cacheKey, response.sentiment);
+    return response.sentiment;
+  } catch (error) {
+    console.error('Error in fetchSentimentData:', error);
+    throw error instanceof ApiError
+      ? error
+      : new ApiError(
+          500,
+          `Failed to fetch sentiment data: ${error instanceof Error ? error.message : 'Unknown error'}`
+        );
+  }
 }
 
 export async function fetchTrendingTopics(
   timeRange: string,
   config?: CacheConfig
 ): Promise<TrendingTopic[]> {
-  const cacheKey = getCacheKey('topics', { timeRange });
-  const cached = getCache<TrendingTopic[]>(cacheKey, config);
-  if (cached) return cached;
+  console.log('fetchTrendingTopics called:', { timeRange, config });
 
-  const url = `${BASE_URL}/trending?timeRange=${timeRange}`;
-  const data = await fetchWithErrorHandling<TrendingTopic[]>(url);
-  setCache(cacheKey, data);
-  return data;
+  try {
+    const cacheKey = getCacheKey('topics', { timeRange });
+    const cached = getCache<TrendingTopic[]>(cacheKey, config);
+    if (cached) {
+      console.log('Returning cached topics data');
+      return cached;
+    }
+
+    // Construct URL with query parameters
+    const url = new URL(BASE_URL, window.location.origin);
+    url.searchParams.set('timeRange', timeRange);
+
+    // Fetch data from API
+    const response = await fetchWithErrorHandling<{
+      metrics: PlatformMetrics;
+      sentiment: SentimentData[];
+      topics: TrendingTopic[];
+    }>(url.toString());
+
+    if (!response.topics) {
+      throw new Error('Invalid response: Missing topics data');
+    }
+
+    // Cache and return topics data
+    setCache(cacheKey, response.topics);
+    return response.topics;
+  } catch (error) {
+    console.error('Error in fetchTrendingTopics:', error);
+    throw error instanceof ApiError
+      ? error
+      : new ApiError(
+          500,
+          `Failed to fetch trending topics: ${error instanceof Error ? error.message : 'Unknown error'}`
+        );
+  }
 }
 
 // Cache management functions

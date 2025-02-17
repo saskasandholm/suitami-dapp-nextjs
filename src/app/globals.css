@@ -77,10 +77,6 @@
     @apply bg-black/40 backdrop-blur-md border border-white/5 rounded-xl;
   }
 
-  .page-header {
-    @apply mb-8 flex justify-between items-center;
-  }
-
   .page-title {
     @apply text-3xl font-bold text-gradient;
   }

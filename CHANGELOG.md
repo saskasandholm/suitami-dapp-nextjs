@@ -7,41 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fixed
-
-- Fixed TypeScript error in BaseChart component:
-  - Added explicit return statement in useEffect hook for when containerRef is not set
-  - Ensured all code paths return a value in cleanup function
-  - Improved type safety in effect cleanup handling
-  - Improved type safety in dimension update logic
-  - Ensured all code paths return a value in getPriorityStyles function
-  - Added proper return statement for low priority case
-  - Improved type safety in priority style handling
-- Fixed import issues in chart components:
-  - Corrected chartStyles import from @/styles/chartStyles
-  - Added proper InsightType import in MemberGrowthChart
-- Added standard background-clip property for better browser compatibility
-- Fixed return statement in BaseChart component to ensure all code paths return a value
-- Fixed runtime error in `HourlyActivityChart` component by:
-  - Correcting chartStyles import from `@/styles/chartStyles`
-  - Improving type safety for hour value handling
-  - Adding proper data transformation for chart values
-- Improved type definitions and interfaces for better type safety
-- Resolved import conflicts and type mismatches
-- Fixed TypeScript errors in `HourlyActivityChart` component:
-  - Removed duplicate `HighlightedData` interface
-  - Fixed event handling for Tremor `BarChart` component
-  - Improved type safety for data transformations and state updates
-  - Ensured proper type conversions for chart values
-- Improved type consistency across chart components
-- Enhanced type safety for event handlers and data transformations
-- Fixed type error in `HourlyActivityChart` component:
-  - Replaced misused `trend` property with `details` in insight related data
-  - Ensured proper type usage for numerical trend values
-  - Improved type consistency in insight data structure
-
 ### Added
 
+- Individual skeleton loaders for chart components
+  - Added base ChartSkeleton component with customizable dimensions and animations
+  - Implemented specific skeleton loaders for SentimentChart and TrendingTopicsChart
+  - Enhanced useCommunityData hook with granular loading states for each data type
+- New Aiden logo implementation in the sidebar
+  - Added collapsible behavior showing only the fox head icon when collapsed
+  - Displays full AIden text next to the icon when expanded
+  - Improved visual consistency with the app's design system
+  - Increased logo and text size by 10% for better visibility
+  - Refined logo positioning with optimized padding
+  - Removed spring animations for smoother transitions
+  - Fixed vertical alignment with navigation icons
+- Enhanced health score visualization in community analytics
+  - Added key insights section with actionable information
+  - Improved platform-specific health indicators with progress bars
+  - Added trend indicators and status labels for each platform
+  - Enhanced visual hierarchy and space utilization
+  - Added total and trend properties to sentiment data
+  - Improved sentiment data type safety and consistency
+- Implemented member growth data generation
+  - Added realistic member growth simulation with trends
+  - Included daily data points with correlated metrics
+  - Added random variations for natural data patterns
+  - Synchronized time ranges across all data types
+  - Fixed member growth chart rendering issues
+- Implemented hourly activity data generation
+  - Added realistic activity patterns for 24-hour periods
+  - Simulated peak hours, evening hours, and night hours
+  - Included message, reaction, and thread counts
+  - Added proper type definitions and validation
+  - Fixed hourly activity chart rendering issues
 - Enhanced Tremor chart utilities integration:
   - Implemented comprehensive color management system
   - Added type-safe color utilities and formatters
@@ -65,152 +63,142 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added date formatter for consistent timestamp display
   - Added tooltip formatter for precise value display
   - Enhanced type safety with proper Color type imports
-- Enhanced chart utilities with Tremor's recommended implementations:
-  - Adopted Tremor's chartColors palette for consistent color management
-  - Integrated cx utility for improved class name management
-  - Added getColorClassName for type-safe color class generation
-  - Implemented getYAxisDomain for flexible axis configuration
-  - Added hasOnlyOneValueForKey for data validation
-  - Enhanced type safety with proper color utility types
-- Implemented legend item interactivity for toggling data series
-- Added keyboard focus states with visual indicators
-- Standardized color mapping for sentiment states
-- Value formatters for numbers and percentages
-- Date formatter for consistent timestamp display
-- Tooltip formatter for precise value display
-- Enhanced type safety with proper Color type imports
 - CSS variables for sentiment colors in chart components
 - Heart fill animation in health score card that reflects the current score percentage
 - Visual score representation with denominator display
 - Smooth transitions and visual feedback for health score changes
+- Enhanced mock API support for hourly activity data:
+  - Added HourlyActivityConfig interface for flexible data generation
+  - Implemented configuration options in API endpoints
+  - Added timezone support and peak hours configuration
+  - Added event simulation options (AMAs, launches, etc.)
+  - Added data validation and error handling
+  - Enhanced type safety with proper interfaces
+  - Added documentation for configuration options
+  - Added correlation between activity metrics
+  - Implemented realistic activity patterns
+  - Added support for weekday/weekend variations
+  - Enhanced event simulation capabilities
+  - Added reproducible data generation with seeds
 
 ### Changed
 
-- Simplified component rendering logic
-- Optimized component lifecycle management
-- Updated documentation structure
-- Fixed chart styling to properly target Tremor components:
-  - Corrected area chart selectors to use Tremor's class structure
-  - Updated color scheme to use Tailwind's emerald, slate, and rose colors
-  - Enhanced hover states with proper opacity transitions
-  - Improved tooltip and legend styling
-  - Added consistent spacing and layout for chart elements
-- Improved chart accessibility
-  - Added ARIA labels and roles to all chart elements
-  - Enhanced keyboard navigation support
-  - Added screen reader descriptions for data points
-  - Improved status announcements for metrics
-- Refined visual design
-  - Made grid lines more subtle with reduced opacity
-  - Updated color scheme for better contrast
-  - Improved spacing and padding throughout
-  - Enhanced responsive design for mobile devices
-- Enhanced chart styling compatibility
-  - Added support for both Tremor and Recharts class names
-  - Improved specificity of chart element selectors
-  - Standardized styling for paths, dots, and tooltips
-  - Unified legend styling across chart libraries
-  - Added consistent hover states and transitions
-- Performance optimizations
-  - Added reduced motion support
-  - Optimized animations for performance
-  - Improved mobile rendering
-- Cleaned up chart styling to exclusively use Tremor classes:
-  - Removed all Recharts-specific selectors from chartStyles.ts
-  - Simplified CSS selectors for better maintainability
-  - Improved specificity by using only Tremor class names
-  - Enhanced code organization with better comments
-  - Maintained all existing styling functionality
-  - Reduced CSS complexity and potential conflicts
-- Migrated sentiment color system to use Tremor's chartColors:
-  - Updated SENTIMENT_COLORS to use AvailableChartColorsKeys
-  - Enhanced SENTIMENT_COLOR_CLASSES with getColorClassName
-  - Improved type safety for color definitions
-- Refactored chart styles for better maintainability:
-  - Organized styles using cx utility
-  - Enhanced selector specificity
-  - Improved dark mode compatibility
-  - Added proper TypeScript types
-- Refactored chart styling system to use CSS variables for sentiment colors
-- Improved color management in SentimentChart and CurrentSentimentChart components
-- Enhanced type safety with proper CSS variable typing
-- Standardized chart color application across components
-- Enhanced code organization and documentation:
-  - Added comprehensive JSDoc comments to chartUtils.ts
-  - Improved organization of chart styles with logical grouping
-  - Enhanced code readability with consistent formatting
-  - Standardized naming conventions across chart components
-  - Optimized chart utility functions for better performance
-- Improved chart styling system:
-  - Organized styles into logical groups with clear comments
-  - Enhanced CSS variable naming consistency
-  - Improved specificity of chart selectors
-  - Standardized style patterns across chart types
-- Enhanced CSS variable system in globals.css:
-  - Added systematic chart color variables with base, fill, text, and stroke variants
-  - Organized variables into logical groups (Theme, Accent, Chart Colors)
-  - Improved Tremor component overrides with better organization and comments
-  - Replaced hardcoded color values with CSS variables for better maintainability
-  - Enhanced code readability with clear section comments
-- Standardized chart component prop types and interfaces:
-  - Centralized type definitions in BaseChart component
-  - Improved type safety with explicit interfaces
-  - Enhanced code organization with clear type grouping
-  - Added comprehensive JSDoc comments
-  - Removed duplicate type declarations
-  - Improved type consistency across chart components
-- Improved chart component organization:
-  - Moved chart styles to dedicated file for better maintainability
-  - Exported types from BaseChart for reuse
-  - Enhanced type safety with proper exports
-  - Improved code organization with clear separation of concerns
-- Updated insight card styling to be more subtle:
-  - Replaced colored backgrounds with uniform white opacity
-  - Changed text colors to use white with varying opacity levels
-  - Improved visual hierarchy through opacity differences
-  - Enhanced readability with consistent background styling
-- Enhanced Community Analytics dashboard layout:
-  - Improved top section with better space utilization
-  - Added platform-specific health indicators to health score card
-  - Expanded trending topics section to utilize full width
-  - Added status indicators to platform links
-  - Improved visual hierarchy and information density
-  - Enhanced responsive layout with better grid organization
+- Improved community analytics API implementation
+  - Consolidated multiple endpoints into a single optimized endpoint
+  - Added proper parameter validation and error handling
+  - Improved response structure with combined data
+  - Enhanced caching mechanism for better performance
+  - Added detailed error messages and logging
+  - Fixed 400 Bad Request errors in API calls
+  - Added member growth data to API response
+  - Added hourly activity data to API response
+- Enhanced sidebar navigation animations and interactions
+  - Improved animation smoothness for sidebar collapse/expand
+  - Added subtle icon-specific hover animations
+  - Refined wallet section with smoother transitions and better visual feedback
+  - Fixed text bouncing issues during sidebar state changes
+  - Ensured consistent vertical movement of all icons
+  - Optimized margin transitions for smoother animations
+- Updated branding to emphasize AI in AIden name
+- Replaced page-level loading indicator with individual chart skeleton loaders
+- Updated community pages to use granular loading states for improved user experience
+- Enhanced documentation with skeleton loader implementation details and troubleshooting guide
+- Improved heart fill effect in the health score card
+- Enhanced visual representation of health scores for Telegram, Discord, and Twitter
+- Removed percentage change from platform health scores
+- Updated social media buttons to reflect connection status visually
+- Adjusted wave effect and size of the heart icon for better visibility
+- Refactored Community Analytics page for better maintainability
+- Enhanced chart rendering and data formatting
+- Enhanced mock data generation for improved realism
+- Cleaned up chart styling to exclusively use Tremor classes
+- Migrated sentiment color system to use Tremor's chartColors
+- Enhanced code organization and documentation
+- Improved chart styling system
+- Enhanced CSS variable system in globals.css
+- Standardized chart component prop types and interfaces
+- Improved chart component organization
+- Updated insight card styling to be more subtle
+- Enhanced Community Analytics dashboard layout
 - Enhanced health score card layout with improved visual hierarchy
 - Updated heart icon container with dynamic fill animation
 - Improved score display with better context and alignment
+- Enhanced community API implementation:
+  - Added support for hourly activity configuration
+  - Improved parameter validation and error handling
+  - Enhanced response structure with configurable data
+  - Added detailed error messages for invalid configurations
+  - Improved type safety in API responses
 
 ### Fixed
 
+- Fixed TypeScript error in BaseChart component
+- Fixed import issues in chart components
+- Added standard background-clip property for better browser compatibility
+- Fixed return statement in BaseChart component
+- Fixed runtime error in `HourlyActivityChart` component
+- Improved type definitions and interfaces
+- Resolved import conflicts and type mismatches
+- Fixed TypeScript errors in `HourlyActivityChart` component
+- Improved type consistency across chart components
+- Enhanced type safety for event handlers and data transformations
+- Resolved chart rendering issues
 - Component rendering performance issues
 - Loading state inconsistencies
 - Error handling edge cases
-- Chart styling specificity issues:
-  - Fixed color application for area chart paths
-  - Corrected legend item colors and spacing
-  - Improved tooltip styling and positioning
-  - Enhanced interactive states for chart elements
-  - Resolved chart container sizing and overflow
+- Chart styling specificity issues
 - Fixed chart legend positioning and styling
 - Improved axis label visibility and contrast
 - Enhanced tooltip positioning and readability
-- Resolved chart color application issues by targeting both Tremor and Recharts classes
+- Resolved chart color application issues
 - Resolved linter errors related to color type definitions
 - Fixed type issues with chart categories and colors
 - Improved type safety in chart components
 - Optimized hasOnlyOneValueForKey function for better performance
 - Improved type safety in chart utility functions
 - Enhanced code formatting consistency
-- Improved consistency in chart color application by centralizing color definitions in CSS variables
-- Enhanced maintainability of Tremor overrides by using CSS variables instead of Tailwind classes
 - Resolved type conflicts in chart components
 - Improved type safety in chart component props
 - Enhanced maintainability with centralized type definitions
-- Resolved chart component issues:
-  - Fixed chartStyles import errors
-  - Resolved type conflicts in BaseChart exports
-  - Fixed missing type exports
-  - Improved code organization and maintainability
+- Resolved chart component issues
+- Fixed type conflicts in event configuration:
+  - Renamed EventConfig to SentimentEventConfig for clarity
+  - Updated related interfaces and functions to use new type
+  - Improved type safety in event handling
+  - Fixed type mismatch between hourly and sentiment events
+  - Enhanced code organization with clearer type naming
+
+### Enhanced
+
+- Improved error handling and validation in mock API:
+  - Added comprehensive validation for hourly activity configuration
+  - Implemented detailed error messages with validation context
+  - Added runtime validation of configuration values
+  - Enhanced error responses with detailed error information
+  - Improved error handling for JSON parsing
+  - Added validation for logical relationships between metrics
+  - Enhanced API response format for validation errors
+  - Added type-safe configuration handling
+  - Improved error message clarity and context
+  - Added validation for timezone and peak hours
+  - Enhanced event simulation configuration
+  - Added seedable random generation support
+
+### Documentation
+
+- Added comprehensive documentation for mock data configuration:
+  - Detailed API configuration options
+  - Example usage and best practices
+  - Error handling guidelines
+  - Configuration validation rules
+  - Activity pattern recommendations
+  - Event simulation guidelines
+  - Timezone handling details
+  - Data correlation explanations
+  - Validation error reference
+  - Configuration examples
+  - Troubleshooting guide
+  - Performance recommendations
 
 ## [0.13.7] - 2024-02-15
 
@@ -1052,3 +1040,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Member growth area chart
 - Hourly activity bar chart
 - Basic interactivity and tooltips
+
+### Enhanced
+
+- Improved error handling and validation in mock API:
+  - Added comprehensive validation for hourly activity configuration
+  - Implemented detailed error messages with validation context
+  - Added runtime validation of configuration values
+  - Enhanced error responses with detailed error information
+  - Improved error handling for JSON parsing
+  - Added validation for logical relationships between metrics
+  - Enhanced API response format for validation errors

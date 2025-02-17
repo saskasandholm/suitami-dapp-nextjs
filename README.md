@@ -5,20 +5,39 @@ A modern, performant Next.js application designed to help community managers and
 ## Features
 
 ### Community Analytics
+
 - **Real-time Insights** 📊
   - Live community metrics and engagement tracking
   - Anomaly detection with AI-powered analysis
   - Customizable dashboards and reporting
+  - Configurable mock data generation for testing and development
 - **Multi-platform Integration** 🔗
   - Discord, Telegram, and Twitter support
   - Unified analytics across platforms
   - Platform-specific metrics and insights
+  - Timezone-aware activity tracking
 - **Performance & Accessibility** ⚡
   - Optimized chart rendering and data visualization
   - WCAG 2.1 compliant interface
   - Mobile-responsive design
+  - Robust error handling and validation
+
+### Development Features
+
+- **Mock Data Generation**
+  - Configurable activity patterns and ranges
+  - Timezone-aware data simulation
+  - Event-based activity spikes (AMAs, launches, etc.)
+  - Realistic correlation between metrics
+  - Seedable random generation for reproducibility
+- **API Features**
+  - Comprehensive parameter validation
+  - Detailed error messages with context
+  - Type-safe request/response handling
+  - Flexible configuration options
 
 ### Performance Optimizations
+
 - Efficient component lifecycle management
 - Optimized rendering patterns
 - Smart loading state handling
@@ -26,6 +45,7 @@ A modern, performant Next.js application designed to help community managers and
 - Memory leak prevention
 
 ### Technical Stack
+
 - [Next.js 14](https://nextjs.org/) with App Router - React framework
 - [TypeScript](https://www.typescriptlang.org/) - Type safety
 - [TailwindCSS](https://tailwindcss.com/) - Styling
@@ -66,6 +86,7 @@ pnpm lint
 ## Best Practices
 
 ### Performance
+
 - Use optimized rendering patterns ([see examples](./docs/LAYOUT_PATTERNS.md#performance))
 - Implement proper loading states ([implementation guide](./docs/community-analytics.md#loading-states))
 - Handle errors gracefully ([error handling patterns](./docs/community-analytics.md#error-handling))
@@ -73,6 +94,7 @@ pnpm lint
 - Optimize data fetching ([data fetching strategies](./docs/community-analytics.md#data-fetching))
 
 ### Accessibility
+
 - ARIA labels for interactive elements ([accessibility guide](./docs/LAYOUT_PATTERNS.md#accessibility))
 - Keyboard navigation support ([keyboard patterns](./docs/LAYOUT_PATTERNS.md#keyboard-navigation))
 - Screen reader compatibility ([screen reader support](./docs/LAYOUT_PATTERNS.md#screen-reader-support))
@@ -80,6 +102,7 @@ pnpm lint
 - Semantic HTML structure ([HTML guidelines](./docs/LAYOUT_PATTERNS.md#semantic-html))
 
 ### Development
+
 - Follow TypeScript best practices ([type safety guide](./docs/community-analytics.md#typescript))
 - Maintain consistent code style ([style guide](./docs/LAYOUT_PATTERNS.md#style-guide))
 - Write comprehensive tests ([testing guide](./docs/community-analytics.md#testing))

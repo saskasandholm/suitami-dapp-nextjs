@@ -6,11 +6,11 @@ import {
   ArrowTrendingDownIcon,
   MinusIcon,
 } from '@heroicons/react/24/outline';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import BaseChart from './BaseChart';
 import { chartStyles } from '@/styles/chartStyles';
 import CustomTooltip from '@/components/common/CustomTooltip';
-import { formatValue } from '@/utils/formatters';
+import { formatValue, formatDate } from '@/utils/formatters';
 import { getColorClassName } from '@/utils/chartUtils';
 import {
   SentimentData,
@@ -61,6 +61,62 @@ export default function SentimentChart({
     () => generateSentimentInsights(metrics, selectedRange),
     [metrics, selectedRange]
   );
+
+  // Format data with unique dates for the chart
+  const formattedData = useMemo(() => {
+    const transformed = data.map((item, index) => {
+      const date = new Date(item.date);
+      const formattedDate = date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      });
+      return {
+        ...item,
+        id: `${date.getTime()}-${index}`, // Unique identifier using timestamp and index
+        displayDate: formattedDate, // Formatted date for display
+        date: item.date, // Keep original date for calculations
+      };
+    });
+
+    // Debug logging
+    console.group('SentimentChart Data Transformation');
+    console.log('Original data:', data);
+    console.log('Transformed data:', transformed);
+    console.log(
+      'Unique IDs:',
+      transformed.map(d => d.id)
+    );
+    console.log('Checking for duplicate IDs...');
+    const ids = transformed.map(d => d.id);
+    const duplicateIds = ids.filter((id, index) => ids.indexOf(id) !== index);
+    if (duplicateIds.length > 0) {
+      console.warn('Found duplicate IDs:', duplicateIds);
+    } else {
+      console.log('No duplicate IDs found');
+    }
+    console.groupEnd();
+
+    return transformed;
+  }, [data]);
+
+  // Additional verification for chart props
+  useEffect(() => {
+    console.group('SentimentChart Props Verification');
+    console.log('Chart index prop:', 'id');
+    console.log('Categories:', Array.from(chartCategories));
+    console.log('Data sample:', formattedData[0]);
+    console.groupEnd();
+  }, [formattedData]);
+
+  // Format value for tooltip and axis labels
+  const formatValue = (value: number) => `${value.toFixed(1)}%`;
+
+  // Custom tick formatter for X-axis
+  const formatXAxisTick = (value: string) => {
+    const dataPoint = formattedData.find(d => d.id === value);
+    return dataPoint?.displayDate || value;
+  };
 
   // Calculate trend metrics for UI
   const trendMetrics = useMemo(() => {
@@ -115,7 +171,7 @@ export default function SentimentChart({
             <div className="flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-accent/10">
               <FaceSmileIcon className="w-4 h-4 text-accent" />
               <Text className="text-sm text-accent">
-                Avg Positive: {formatValue(trendMetrics.avgPositive, 'percent')}
+                Avg Positive: {formatValue(trendMetrics.avgPositive)}
               </Text>
             </div>
             <motion.div
@@ -144,23 +200,42 @@ export default function SentimentChart({
         <div className="relative min-h-[300px] w-full">
           <AreaChart
             className={`${chartStyles.areaChart.className} h-[300px] transition-opacity duration-200`}
-            data={data}
-            index="date"
+            data={formattedData}
+            index="id"
             categories={Array.from(chartCategories)}
             colors={chartColors}
-            valueFormatter={value => formatValue(value, 'percent')}
+            valueFormatter={value => formatValue(value)}
             showAnimation={true}
             stack={true}
             curveType="monotone"
-            customTooltip={CustomTooltip}
+            customTooltip={(props: any) => {
+              const dataPoint = formattedData.find(d => d.id === props.activePoint?.x);
+              if (!dataPoint) return null;
+              return CustomTooltip({
+                ...props,
+                activePoint: {
+                  ...props.activePoint,
+                  x: dataPoint.displayDate,
+                  id: dataPoint.id,
+                },
+              });
+            }}
             showGridLines={false}
             minValue={0}
             maxValue={100}
-            startEndOnly={true}
+            startEndOnly={false}
             showLegend={true}
             onValueChange={(v: EventProps | null) => {
-              setHoveredPoint(v ? String(v.date) : null);
+              setHoveredPoint(v ? String(v.id) : null);
             }}
+            showXAxis={true}
+            showYAxis={true}
+            yAxisWidth={56}
+            enableLegendSlider={false}
+            noDataText="No data available"
+            rotateLabelX={{ angle: -45, verticalShift: 10 }}
+            autoMinValue={true}
+            allowDecimals={false}
           />
           {/* Enhanced hover effect with trend indicator */}
           <div
