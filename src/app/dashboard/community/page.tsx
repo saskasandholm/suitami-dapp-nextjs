@@ -369,6 +369,12 @@ interface ChartEntry {
 export default function CommunityPage() {
   const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>('24h');
   const [selectedPlatform, setSelectedPlatform] = useState<PlatformName | 'all'>('all');
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   const { data, isMetricsLoading, isSentimentLoading, isTopicsLoading, error, refetch } =
     useCommunityData({
       timeRange: selectedTimeRange,
@@ -377,7 +383,7 @@ export default function CommunityPage() {
 
   // Calculate health score with proper null checks
   const healthScore = useMemo(() => {
-    if (isMetricsLoading) {
+    if (!isClient || isMetricsLoading) {
       console.log('Health score calculation: Loading metrics...');
       return null;
     }
@@ -393,7 +399,7 @@ export default function CommunityPage() {
     }
 
     return calculateHealthScore(data.metrics);
-  }, [data?.metrics, isMetricsLoading, error]);
+  }, [data?.metrics, isMetricsLoading, error, isClient]);
 
   // Handle time range change
   const handleTimeRangeChange = (range: TimeRange) => {
@@ -468,9 +474,9 @@ export default function CommunityPage() {
     );
   }
 
-  // Add loading state for the entire page only if all data is loading
+  // Add loading state for the entire page only if all data is loading or client hasn't initialized
   const isInitialLoading = isMetricsLoading && isSentimentLoading && isTopicsLoading;
-  if (isInitialLoading) {
+  if (!isClient || isInitialLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]" role="status">
         <div className="text-center">
@@ -482,66 +488,64 @@ export default function CommunityPage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between mb-6">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold text-gradient">Community Analytics</h1>
-          <p className="text-white/70">
-            Monitor your community growth and engagement across platforms
-          </p>
-        </div>
-        <div className="flex items-center space-x-4">
-          <div className="flex space-x-2">
-            {timeRanges.map(range => (
-              <button
-                key={range.value}
-                onClick={() => handleTimeRangeChange(range.value)}
-                className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
-                  selectedTimeRange === range.value
-                    ? 'bg-accent text-black'
-                    : 'bg-white/5 text-white/70 hover:bg-white/10'
-                }`}
-              >
-                {range.label}
-              </button>
-            ))}
-          </div>
-          <div className="flex space-x-2">
-            {Object.entries(platformLinks).map(([platform, link]) => {
-              const isConnected = link && link !== '#' && !link.includes('your-');
-              return (
-                <a
-                  key={platform}
-                  href={isConnected ? link : '#'}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`p-2 rounded-lg transition-all duration-300 ${
-                    isConnected
-                      ? 'bg-white/5 hover:bg-white/10 cursor-pointer'
-                      : 'bg-white/5 opacity-50 cursor-not-allowed'
+      <PageHeader
+        title="Community Analytics"
+        description="Monitor your community growth and engagement across platforms"
+        rightContent={
+          <div className="flex items-center space-x-4">
+            <div className="flex space-x-2">
+              {timeRanges.map(range => (
+                <button
+                  key={range.value}
+                  onClick={() => handleTimeRangeChange(range.value)}
+                  className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                    selectedTimeRange === range.value
+                      ? 'bg-accent text-black'
+                      : 'bg-white/5 text-white/70 hover:bg-white/10'
                   }`}
-                  title={`${platform.charAt(0).toUpperCase() + platform.slice(1)} ${isConnected ? '(Connected)' : '(Not Connected)'}`}
                 >
-                  {platform === 'telegram' && (
-                    <PaperAirplaneIcon
-                      className={`w-5 h-5 ${isConnected ? 'text-accent' : 'text-white/50'}`}
-                    />
-                  )}
-                  {platform === 'discord' && (
-                    <DiscordLogoIcon
-                      className={`w-5 h-5 ${isConnected ? 'text-accent' : 'text-white/50'}`}
-                    />
-                  )}
-                  {platform === 'twitter' && (
-                    <TwitterLogoIcon
-                      className={`w-5 h-5 ${isConnected ? 'text-accent' : 'text-white/50'}`}
-                    />
-                  )}
-                </a>
-              );
-            })}
+                  {range.label}
+                </button>
+              ))}
+            </div>
+            <div className="flex space-x-2">
+              {Object.entries(platformLinks).map(([platform, link]) => {
+                const isConnected = link && link !== '#' && !link.includes('your-');
+                return (
+                  <a
+                    key={platform}
+                    href={isConnected ? link : '#'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`p-2 rounded-lg transition-all duration-300 ${
+                      isConnected
+                        ? 'bg-white/5 hover:bg-white/10 cursor-pointer'
+                        : 'bg-white/5 opacity-50 cursor-not-allowed'
+                    }`}
+                    title={`${platform.charAt(0).toUpperCase() + platform.slice(1)} ${isConnected ? '(Connected)' : '(Not Connected)'}`}
+                  >
+                    {platform === 'telegram' && (
+                      <PaperAirplaneIcon
+                        className={`w-5 h-5 ${isConnected ? 'text-accent' : 'text-white/50'}`}
+                      />
+                    )}
+                    {platform === 'discord' && (
+                      <DiscordLogoIcon
+                        className={`w-5 h-5 ${isConnected ? 'text-accent' : 'text-white/50'}`}
+                      />
+                    )}
+                    {platform === 'twitter' && (
+                      <TwitterLogoIcon
+                        className={`w-5 h-5 ${isConnected ? 'text-accent' : 'text-white/50'}`}
+                      />
+                    )}
+                  </a>
+                );
+              })}
+            </div>
           </div>
-        </div>
-      </div>
+        }
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Health Score Card */}
@@ -628,82 +632,143 @@ export default function CommunityPage() {
                     ) : healthScore === null ? (
                       <Text className="text-yellow-400 text-4xl">N/A</Text>
                     ) : (
-                      <div className="flex items-baseline space-x-2">
-                        <Title className="text-white text-5xl font-semibold">
-                          {healthScore.toFixed(1)}
-                        </Title>
-                        <Text className="text-white/50">/ 100</Text>
+                      <div className="space-y-2">
+                        <div className="flex items-baseline space-x-2">
+                          <Title className="text-white text-5xl font-semibold">
+                            {healthScore.toFixed(1)}
+                          </Title>
+                          <Text className="text-white/50">/ 100</Text>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          {healthScore >= 80 ? (
+                            <ArrowUpCircleIcon className="w-5 h-5 text-emerald-400" />
+                          ) : healthScore >= 60 ? (
+                            <ArrowPathIcon className="w-5 h-5 text-yellow-400" />
+                          ) : (
+                            <ArrowDownCircleIcon className="w-5 h-5 text-rose-400" />
+                          )}
+                          <Text
+                            className={`text-sm ${
+                              healthScore >= 80
+                                ? 'text-emerald-400'
+                                : healthScore >= 60
+                                  ? 'text-yellow-400'
+                                  : 'text-rose-400'
+                            }`}
+                          >
+                            {healthScore >= 80
+                              ? 'Healthy'
+                              : healthScore >= 60
+                                ? 'Needs Attention'
+                                : 'Critical'}
+                          </Text>
+                        </div>
                       </div>
                     )}
                   </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  {!isMetricsLoading && !error && healthScore !== null && (
-                    <>
-                      {healthScore >= 80 ? (
-                        <ArrowUpCircleIcon className="w-8 h-8 text-emerald-400" />
-                      ) : healthScore >= 60 ? (
-                        <ArrowPathIcon className="w-8 h-8 text-yellow-400" />
-                      ) : (
-                        <ArrowDownCircleIcon className="w-8 h-8 text-rose-400" />
-                      )}
-                      <Text
-                        className={`text-base ${
-                          healthScore >= 80
-                            ? 'text-emerald-400'
-                            : healthScore >= 60
-                              ? 'text-yellow-400'
-                              : 'text-rose-400'
-                        }`}
-                      >
-                        {healthScore >= 80
-                          ? 'Healthy'
-                          : healthScore >= 60
-                            ? 'Needs Attention'
-                            : 'Critical'}
+
+                {/* Key Insights */}
+                <div className="border-l border-white/10 pl-8">
+                  <Text className="text-white/70 text-lg mb-4">Key Insights</Text>
+                  <div className="space-y-3">
+                    <div className="flex items-start space-x-3">
+                      <div className="w-5 h-5 rounded-full bg-emerald-400/10 flex-shrink-0 flex items-center justify-center mt-0.5">
+                        <ArrowUpCircleIcon className="w-4 h-4 text-emerald-400" />
+                      </div>
+                      <Text className="text-white/90">
+                        Discord shows strongest performance with 82% health score
                       </Text>
-                    </>
-                  )}
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <div className="w-5 h-5 rounded-full bg-yellow-400/10 flex-shrink-0 flex items-center justify-center mt-0.5">
+                        <ArrowPathIcon className="w-4 h-4 text-yellow-400" />
+                      </div>
+                      <Text className="text-white/90">
+                        Telegram and Twitter need attention to improve engagement
+                      </Text>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <div className="w-5 h-5 rounded-full bg-accent/10 flex-shrink-0 flex items-center justify-center mt-0.5">
+                        <ChartBarIcon className="w-4 h-4 text-accent" />
+                      </div>
+                      <Text className="text-white/90">
+                        Overall trend is positive across all platforms
+                      </Text>
+                    </div>
+                  </div>
                 </div>
               </div>
 
               {/* Platform-specific health indicators */}
-              <div className="flex-1 flex flex-col justify-center">
-                <div className="grid grid-cols-3 gap-4">
-                  {Object.entries(platformMetrics).map(([platform, metrics]) => (
-                    <div
-                      key={platform}
-                      className="flex flex-col p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-all duration-300"
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center space-x-2">
-                          {platform === 'telegram' && (
-                            <PaperAirplaneIcon className="w-5 h-5 text-accent" />
-                          )}
-                          {platform === 'discord' && (
-                            <DiscordLogoIcon className="w-5 h-5 text-accent" />
-                          )}
-                          {platform === 'twitter' && (
-                            <TwitterLogoIcon className="w-5 h-5 text-accent" />
-                          )}
-                          <div className="text-base text-white/90 capitalize">{platform}</div>
-                        </div>
-                        <div
-                          className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                            metrics.sentiment.score >= 80
-                              ? 'bg-emerald-400'
-                              : metrics.sentiment.score >= 60
-                                ? 'bg-yellow-400'
-                                : 'bg-rose-400'
-                          }`}
-                        />
+              <div className="grid grid-cols-3 gap-4">
+                {Object.entries(platformMetrics).map(([platform, metrics]) => (
+                  <div
+                    key={platform}
+                    className="flex flex-col p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-all duration-300"
+                  >
+                    <div className="flex items-center space-x-2 mb-3">
+                      {platform === 'telegram' && (
+                        <PaperAirplaneIcon className="w-5 h-5 text-accent" />
+                      )}
+                      {platform === 'discord' && (
+                        <DiscordLogoIcon className="w-5 h-5 text-accent" />
+                      )}
+                      {platform === 'twitter' && (
+                        <TwitterLogoIcon className="w-5 h-5 text-accent" />
+                      )}
+                      <div className="text-base text-white/90 capitalize">{platform}</div>
+                    </div>
+
+                    <div className="relative w-full h-2 bg-white/5 rounded-full overflow-hidden mb-3">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${metrics.sentiment.score}%` }}
+                        className={`absolute h-full rounded-full ${
+                          metrics.sentiment.score >= 80
+                            ? 'bg-emerald-400'
+                            : metrics.sentiment.score >= 60
+                              ? 'bg-yellow-400'
+                              : 'bg-rose-400'
+                        }`}
+                        transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-baseline space-x-1">
+                        <span className="text-2xl font-semibold text-white">
+                          {metrics.sentiment.score}
+                        </span>
+                        <span className="text-sm text-white/50">/100</span>
                       </div>
-                      <div className="text-2xl font-semibold text-white mt-1">
-                        {metrics.sentiment.score}
+                      <div className="flex items-center space-x-1">
+                        {metrics.sentiment.trend === 'up' ? (
+                          <ArrowUpCircleIcon className="w-4 h-4 text-emerald-400" />
+                        ) : metrics.sentiment.trend === 'down' ? (
+                          <ArrowDownCircleIcon className="w-4 h-4 text-rose-400" />
+                        ) : (
+                          <ArrowPathIcon className="w-4 h-4 text-yellow-400" />
+                        )}
+                        <span
+                          className={`text-sm ${
+                            metrics.sentiment.trend === 'up'
+                              ? 'text-emerald-400'
+                              : metrics.sentiment.trend === 'down'
+                                ? 'text-rose-400'
+                                : 'text-yellow-400'
+                          }`}
+                        >
+                          {metrics.sentiment.trend === 'up'
+                            ? 'Improving'
+                            : metrics.sentiment.trend === 'down'
+                              ? 'Declining'
+                              : 'Stable'}
+                        </span>
                       </div>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
             </div>
           </Card>
