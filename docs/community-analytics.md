@@ -274,6 +274,54 @@ export function BaseChart({ data, options, ...props }: BaseChartProps) {
 }
 ```
 
+### Skeleton Loaders
+
+The community analytics dashboard implements skeleton loaders for individual chart components to improve the perceived performance and user experience. Each chart component has its own dedicated skeleton loader that appears while the specific data for that chart is being fetched.
+
+Key features of the skeleton loaders:
+
+- Independent loading states for each chart
+- Smooth animations and transitions
+- Visual representation matching the actual chart layout
+- Consistent styling with the dashboard theme
+
+Example usage:
+
+```tsx
+import { SentimentChartSkeleton } from '@/components/charts/SentimentChartSkeleton';
+
+function MyComponent() {
+  const { sentiment, isSentimentLoading } = useCommunityData('community-id');
+
+  return (
+    <div>
+      {isSentimentLoading ? <SentimentChartSkeleton /> : <SentimentChart data={sentiment} />}
+    </div>
+  );
+}
+```
+
+### Troubleshooting Skeleton Loaders
+
+Common issues and solutions:
+
+1. Skeletons not appearing:
+
+   - Verify that the loading state is properly set in useCommunityData
+   - Check that the skeleton component is properly imported
+   - Ensure the conditional rendering logic is correct
+
+2. Incorrect loading states:
+
+   - Check that the loading states in useCommunityData are being updated correctly
+   - Verify that the API calls are properly setting and clearing loading states
+   - Ensure error states are being handled appropriately
+
+3. Styling inconsistencies:
+   - Confirm that the skeleton components are using the correct theme variables
+   - Check that the skeleton dimensions match the actual chart components
+   - Verify that the animation classes are being applied correctly
+
 ## Common Tasks
 
 ### 1. Add a New Metric
@@ -417,6 +465,7 @@ async function exportData(timeRange: string) {
      - Add logging for debugging
 
 4. **Performance Issues**
+
    - **Symptoms**:
      - Slow chart updates
      - UI lag when filtering

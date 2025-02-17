@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { Card, Title, Text, DonutChart, AreaChart } from '@tremor/react';
+import { Card, Title, Text, DonutChart, AreaChart, Grid } from '@tremor/react';
 import { motion } from 'framer-motion';
 import {
   UserGroupIcon,
@@ -26,6 +26,8 @@ import HourlyActivityChart from '@/components/charts/HourlyActivityChart';
 import TrendingTopicsChart from '@/components/charts/TrendingTopicsChart';
 import SentimentChart from '@/components/charts/SentimentChart';
 import CurrentSentimentChart from '@/components/charts/CurrentSentimentChart';
+import SentimentChartSkeleton from '@/components/charts/SentimentChartSkeleton';
+import TrendingTopicsChartSkeleton from '@/components/charts/TrendingTopicsChartSkeleton';
 
 // Time range options for analytics
 const timeRanges: { label: string; value: TimeRange }[] = [
@@ -367,16 +369,15 @@ interface ChartEntry {
 export default function CommunityPage() {
   const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>('24h');
   const [selectedPlatform, setSelectedPlatform] = useState<PlatformName | 'all'>('all');
-  const {
-    data,
-    isLoading: loading,
-    error,
-    refetch,
-  } = useCommunityData(selectedTimeRange, selectedPlatform);
+  const { data, isMetricsLoading, isSentimentLoading, isTopicsLoading, error, refetch } =
+    useCommunityData({
+      timeRange: selectedTimeRange,
+      platform: selectedPlatform,
+    });
 
   // Calculate health score with proper null checks
   const healthScore = useMemo(() => {
-    if (loading) {
+    if (isMetricsLoading) {
       console.log('Health score calculation: Loading metrics...');
       return null;
     }
@@ -392,7 +393,7 @@ export default function CommunityPage() {
     }
 
     return calculateHealthScore(data.metrics);
-  }, [data?.metrics, loading, error]);
+  }, [data?.metrics, isMetricsLoading, error]);
 
   // Handle time range change
   const handleTimeRangeChange = (range: TimeRange) => {
@@ -467,8 +468,9 @@ export default function CommunityPage() {
     );
   }
 
-  // Add loading state
-  if (loading) {
+  // Add loading state for the entire page only if all data is loading
+  const isInitialLoading = isMetricsLoading && isSentimentLoading && isTopicsLoading;
+  if (isInitialLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]" role="status">
         <div className="text-center">
@@ -619,7 +621,7 @@ export default function CommunityPage() {
                   </div>
                   <div>
                     <Text className="text-white/70 text-lg mb-1">Overall Health Score</Text>
-                    {loading ? (
+                    {isMetricsLoading ? (
                       <div className="animate-pulse bg-white/10 h-12 w-32 rounded mt-1"></div>
                     ) : error ? (
                       <Text className="text-red-400 text-4xl">Error</Text>
@@ -636,7 +638,7 @@ export default function CommunityPage() {
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
-                  {!loading && !error && healthScore !== null && (
+                  {!isMetricsLoading && !error && healthScore !== null && (
                     <>
                       {healthScore >= 80 ? (
                         <ArrowUpCircleIcon className="w-8 h-8 text-emerald-400" />
@@ -707,13 +709,17 @@ export default function CommunityPage() {
           </Card>
         </motion.div>
 
-        {/* Trending Topics Card */}
+        {/* Trending Topics Card with independent loading */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <TrendingTopicsChart topics={getSelectedPlatformMetrics().trendingTopics} />
+          {isTopicsLoading ? (
+            <TrendingTopicsChartSkeleton />
+          ) : (
+            <TrendingTopicsChart topics={data.topics || []} />
+          )}
         </motion.div>
       </div>
 
@@ -796,13 +802,17 @@ export default function CommunityPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <SentimentChart data={sentimentData} selectedRange={selectedTimeRange} />
+        {isSentimentLoading ? (
+          <SentimentChartSkeleton />
+        ) : (
+          <SentimentChart data={data.sentiment || []} selectedRange={selectedTimeRange} />
+        )}
 
         <CurrentSentimentChart
           data={{
-            positive: metrics?.sentiment?.positive || 0,
-            neutral: metrics?.sentiment?.neutral || 0,
-            negative: metrics?.sentiment?.negative || 0,
+            positive: data.metrics?.sentiment?.positive || 0,
+            neutral: data.metrics?.sentiment?.neutral || 0,
+            negative: data.metrics?.sentiment?.negative || 0,
           }}
         />
       </div>

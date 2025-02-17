@@ -4,98 +4,83 @@ import {
   fetchCommunityMetrics,
   fetchSentimentData,
   fetchTrendingTopics,
-  ApiError
+  ApiError,
 } from '@/services/communityApi';
 
-interface CommunityData {
-  metrics: CommunityMetrics | null;
-  sentiment: SentimentData[] | null;
-  topics: TrendingTopic[] | null;
+interface CommunityDataParams {
+  timeRange?: string;
+  platform?: string;
 }
 
-interface UseCommunityDataReturn {
-  data: CommunityData;
-  isLoading: boolean;
-  error: string | null;
+interface CommunityDataReturn {
+  data: {
+    metrics: CommunityMetrics | null;
+    sentiment: SentimentData[] | null;
+    topics: TrendingTopic[] | null;
+  };
+  isMetricsLoading: boolean;
+  isSentimentLoading: boolean;
+  isTopicsLoading: boolean;
+  error: Error | null;
   refetch: (forceRefresh?: boolean) => Promise<void>;
 }
 
-export function useCommunityData(
-  timeRange: string = '24h',
-  platform: string = 'all'
-): UseCommunityDataReturn {
-  const [data, setData] = useState<CommunityData>({
-    metrics: null,
-    sentiment: null,
-    topics: null
-  });
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export function useCommunityData({
+  timeRange = '24h',
+  platform = 'all',
+}: CommunityDataParams = {}): CommunityDataReturn {
+  const [metrics, setMetrics] = useState<CommunityMetrics | null>(null);
+  const [sentiment, setSentiment] = useState<SentimentData[] | null>(null);
+  const [topics, setTopics] = useState<TrendingTopic[] | null>(null);
+  const [isMetricsLoading, setIsMetricsLoading] = useState(true);
+  const [isSentimentLoading, setIsSentimentLoading] = useState(true);
+  const [isTopicsLoading, setIsTopicsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
   const fetchData = async (forceRefresh: boolean = false) => {
-    const startTime = performance.now();
-    console.log(`[useCommunityData] Starting data fetch at ${new Date().toISOString()}`);
-    console.log(`[useCommunityData] Parameters:`, { timeRange, platform, forceRefresh });
+    setError(null);
 
     try {
-      setIsLoading(true);
-      setError(null);
+      // Fetch metrics
+      setIsMetricsLoading(true);
+      const metricsData = await fetchCommunityMetrics(platform, timeRange, { forceRefresh });
+      setMetrics(metricsData);
+      setIsMetricsLoading(false);
 
-      console.log(`[useCommunityData] Fetching all data...`);
-      const [metricsData, sentimentData, topicsData] = await Promise.all([
-        fetchCommunityMetrics(platform, timeRange, { forceRefresh }),
-        fetchSentimentData(timeRange, { forceRefresh }),
-        fetchTrendingTopics(timeRange, { forceRefresh })
-      ]);
+      // Fetch sentiment
+      setIsSentimentLoading(true);
+      const sentimentData = await fetchSentimentData(timeRange, { forceRefresh });
+      setSentiment(sentimentData);
+      setIsSentimentLoading(false);
 
-      console.log(`[useCommunityData] Data fetch completed:`, {
-        hasMetrics: !!metricsData,
-        hasSentiment: !!sentimentData,
-        hasTopics: !!topicsData,
-        fetchTime: `${(performance.now() - startTime).toFixed(2)}ms`
-      });
-
-      setData({
-        metrics: metricsData,
-        sentiment: sentimentData,
-        topics: topicsData
-      });
+      // Fetch topics
+      setIsTopicsLoading(true);
+      const topicsData = await fetchTrendingTopics(timeRange, { forceRefresh });
+      setTopics(topicsData);
+      setIsTopicsLoading(false);
     } catch (err) {
-      const message = err instanceof ApiError 
-        ? err.message 
-        : 'Failed to fetch community data';
-      console.error(`[useCommunityData] Error fetching data:`, message);
-      setError(message);
-    } finally {
-      setIsLoading(false);
-      console.log(`[useCommunityData] Data fetch cycle completed in ${(performance.now() - startTime).toFixed(2)}ms`);
+      setError(err as Error);
+      // Reset loading states on error
+      setIsMetricsLoading(false);
+      setIsSentimentLoading(false);
+      setIsTopicsLoading(false);
     }
   };
 
   useEffect(() => {
-    console.log(`[useCommunityData] Effect triggered with:`, { timeRange, platform });
-    let isMounted = true;
-
-    const loadData = async () => {
-      if (!isMounted) {
-        console.log(`[useCommunityData] Component unmounted, skipping data load`);
-        return;
-      }
-      await fetchData();
-    };
-
-    loadData();
-
-    return () => {
-      isMounted = false;
-      console.log(`[useCommunityData] Cleanup - component unmounting`);
-    };
+    fetchData();
   }, [timeRange, platform]);
 
   return {
-    data,
-    isLoading,
+    data: {
+      metrics,
+      sentiment,
+      topics,
+    },
+    isMetricsLoading,
+    isSentimentLoading,
+    isTopicsLoading,
     error,
-    refetch: fetchData
+    refetch: fetchData,
   };
-} 
+}
