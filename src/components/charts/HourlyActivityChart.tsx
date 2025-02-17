@@ -2,22 +2,17 @@ import { BarChart } from '@tremor/react';
 import { motion } from 'framer-motion';
 import { ClockIcon } from '@heroicons/react/24/outline';
 import { useState, useMemo } from 'react';
-import BaseChart, { chartStyles, InsightType } from './BaseChart';
+import BaseChart, { InsightType, HighlightedData } from './BaseChart';
 import CustomTooltip from '@/components/common/CustomTooltip';
 import { formatValue } from '@/utils/formatters';
+import { chartStyles } from '@/styles/chartStyles';
+import type { EventProps } from '@tremor/react';
 
 interface HourlyActivityData {
   hour: string;
   messages: number;
   reactions: number;
   threads: number;
-}
-
-type HighlightedDataKey = 'messages' | 'reactions' | 'threads' | 'hour' | 'category' | string;
-
-interface HighlightedData {
-  key: HighlightedDataKey;
-  value: string;
 }
 
 interface HourlyActivityChartProps {
@@ -28,12 +23,12 @@ interface HourlyActivityChartProps {
   chartId?: string;
 }
 
-export default function HourlyActivityChart({ 
-  data, 
+export default function HourlyActivityChart({
+  data,
   selectedDate,
   onHighlightChange,
   highlightedData,
-  chartId = 'hourly-activity'
+  chartId = 'hourly-activity',
 }: HourlyActivityChartProps) {
   const [selectedBar, setSelectedBar] = useState<string | null>(null);
   const [hiddenSeries, setHiddenSeries] = useState<string[]>([]);
@@ -46,44 +41,50 @@ export default function HourlyActivityChart({
   const categoryLabels = {
     messages: 'Messages',
     reactions: 'Reactions',
-    threads: 'Threads'
+    threads: 'Threads',
   };
 
   // Calculate peak hours and activity metrics with enhanced insights
   const metrics = useMemo(() => {
-    const totals = data.reduce((acc, hour) => ({
-      messages: acc.messages + hour.messages,
-      reactions: acc.reactions + hour.reactions,
-      threads: acc.threads + hour.threads
-    }), { messages: 0, reactions: 0, threads: 0 });
+    const totals = data.reduce(
+      (acc, hour) => ({
+        messages: acc.messages + hour.messages,
+        reactions: acc.reactions + hour.reactions,
+        threads: acc.threads + hour.threads,
+      }),
+      { messages: 0, reactions: 0, threads: 0 }
+    );
 
     const hourlyTotals = data.map(hour => ({
       hour: hour.hour,
-      total: hour.messages + hour.reactions + hour.threads
+      total: hour.messages + hour.reactions + hour.threads,
     }));
 
-    const peakHour = hourlyTotals.reduce((peak, curr) => 
-      curr.total > peak.total ? curr : peak
-    , hourlyTotals[0]);
+    const peakHour = hourlyTotals.reduce(
+      (peak, curr) => (curr.total > peak.total ? curr : peak),
+      hourlyTotals[0]
+    );
 
-    const quietHour = hourlyTotals.reduce((quiet, curr) => 
-      curr.total < quiet.total ? curr : quiet
-    , hourlyTotals[0]);
+    const quietHour = hourlyTotals.reduce(
+      (quiet, curr) => (curr.total < quiet.total ? curr : quiet),
+      hourlyTotals[0]
+    );
 
-    const avgActivity = hourlyTotals.reduce((sum, curr) => sum + curr.total, 0) / hourlyTotals.length;
+    const avgActivity =
+      hourlyTotals.reduce((sum, curr) => sum + curr.total, 0) / hourlyTotals.length;
 
     return { totals, peakHour, quietHour, avgActivity };
   }, [data]);
 
-  const totalActivity = useMemo(() => 
-    metrics.totals.messages + metrics.totals.reactions + metrics.totals.threads,
+  const totalActivity = useMemo(
+    () => metrics.totals.messages + metrics.totals.reactions + metrics.totals.threads,
     [metrics.totals]
   );
 
   // Generate enhanced insights based on the data
   const insights = useMemo(() => {
     const insights: InsightType[] = [];
-    
+
     // Peak activity insight (High priority with action)
     insights.push({
       text: `Peak activity at ${metrics.peakHour.hour}:00 with ${formatValue(metrics.peakHour.total, 'activity')} interactions`,
@@ -93,41 +94,44 @@ export default function HourlyActivityChart({
       relatedData: {
         hour: metrics.peakHour.hour,
         total: metrics.peakHour.total,
-        breakdown: 'Click to see activity breakdown'
+        breakdown: 'Click to see activity breakdown',
       },
       highlightData: {
         key: 'hour',
-        value: metrics.peakHour.hour
+        value: metrics.peakHour.hour,
       },
-      relatedCharts: [{
-        chartId: 'member-growth',
-        insight: 'Check if peak activity times correlate with member growth'
-      }]
+      relatedCharts: [
+        {
+          chartId: 'member-growth',
+          insight: 'Check if peak activity times correlate with member growth',
+        },
+      ],
     });
-    
+
     // Activity distribution insight (Medium priority)
-    const mostActive = Object.entries(metrics.totals)
-      .sort(([,a], [,b]) => b - a)[0];
+    const mostActive = Object.entries(metrics.totals).sort(([, a], [, b]) => b - a)[0];
     insights.push({
       text: `${categoryLabels[mostActive[0] as keyof typeof categoryLabels]} are the most common interaction (${((mostActive[1] / totalActivity) * 100).toFixed(1)}%)`,
       priority: 'medium' as const,
       isExpandable: true,
       relatedData: {
         type: mostActive[0],
-        count: mostActive[1],
-        percentage: ((mostActive[1] / totalActivity) * 100).toFixed(1),
-        trend: 'Click to see historical trends'
+        count: Number(mostActive[1]),
+        percentage: String(((mostActive[1] / totalActivity) * 100).toFixed(1)),
+        details: 'Click to see historical trends',
       },
       highlightData: {
         key: 'category',
-        value: mostActive[0]
+        value: mostActive[0],
       },
-      relatedCharts: [{
-        chartId: 'sentiment',
-        insight: 'Compare interaction types with sentiment trends'
-      }]
+      relatedCharts: [
+        {
+          chartId: 'sentiment',
+          insight: 'Compare interaction types with sentiment trends',
+        },
+      ],
     });
-    
+
     // Quiet hours insight (Medium priority with action if very low)
     const quietHourActivity = metrics.quietHour.total;
     const avgHourlyActivity = metrics.avgActivity;
@@ -135,41 +139,47 @@ export default function HourlyActivityChart({
 
     insights.push({
       text: `Lowest activity at ${metrics.quietHour.hour}:00 with ${formatValue(metrics.quietHour.total, 'activity')} interactions`,
-      priority: isVeryQuiet ? 'medium' as const : 'low' as const,
-      action: isVeryQuiet ? 'Consider strategies to maintain engagement during quiet hours' : undefined,
+      priority: isVeryQuiet ? ('medium' as const) : ('low' as const),
+      action: isVeryQuiet
+        ? 'Consider strategies to maintain engagement during quiet hours'
+        : undefined,
       isExpandable: true,
       relatedData: {
         hour: metrics.quietHour.hour,
         total: metrics.quietHour.total,
         avgActivity: metrics.avgActivity,
-        details: 'Click to see quiet hours pattern'
+        details: 'Click to see quiet hours pattern',
       },
       highlightData: {
         key: 'hour',
-        value: metrics.quietHour.hour
-      }
+        value: metrics.quietHour.hour,
+      },
     });
-    
+
     return insights;
   }, [metrics, totalActivity, categoryLabels]);
 
   // Handle insight click for drill-down and highlighting
   const handleInsightClick = (insight: InsightType | null) => {
     if (insight?.highlightData) {
-      setHighlightedHour(insight.highlightData.key === 'hour' ? insight.highlightData.value : null);
-      onHighlightChange?.(insight.highlightData);
+      const hourValue =
+        insight.highlightData.key === 'hour' ? String(insight.highlightData.value) : null;
+      setHighlightedHour(hourValue);
+      onHighlightChange?.({
+        key: insight.highlightData.key,
+        value: String(insight.highlightData.value),
+      });
     } else {
       setHighlightedHour(null);
-      onHighlightChange?.({ key: '', value: '' });
+      onHighlightChange?.({
+        key: '',
+        value: '',
+      });
     }
   };
 
   const handleLegendClick = (item: string) => {
-    setHiddenSeries(prev => 
-      prev.includes(item) 
-        ? prev.filter(i => i !== item)
-        : [...prev, item]
-    );
+    setHiddenSeries(prev => (prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]));
   };
 
   const visibleCategories = categories.filter(cat => !hiddenSeries.includes(cat));
@@ -180,7 +190,7 @@ export default function HourlyActivityChart({
     return {
       messages: ((metrics.totals.messages / total) * 100).toFixed(1),
       reactions: ((metrics.totals.reactions / total) * 100).toFixed(1),
-      threads: ((metrics.totals.threads / total) * 100).toFixed(1)
+      threads: ((metrics.totals.threads / total) * 100).toFixed(1),
     };
   }, [metrics.totals, totalActivity]);
 
@@ -207,6 +217,35 @@ export default function HourlyActivityChart({
   // Add highlight transition styles
   const highlightTransitionStyles = 'transition-all duration-300 ease-in-out';
 
+  const handleValueChange = (value: EventProps) => {
+    if (!value) {
+      setSelectedBar(null);
+      setHighlightedHour(null);
+      onHighlightChange?.({
+        key: '',
+        value: '',
+      });
+      return;
+    }
+
+    const hourValue = String(value.hour);
+    setSelectedBar(hourValue);
+    setHighlightedHour(hourValue);
+    onHighlightChange?.({
+      key: 'hour',
+      value: hourValue,
+    });
+  };
+
+  const transformedData = useMemo(
+    () =>
+      data.map(item => ({
+        ...item,
+        hour: String(item.hour),
+      })),
+    [data]
+  );
+
   return (
     <BaseChart
       title="Hourly Engagement Patterns"
@@ -214,11 +253,15 @@ export default function HourlyActivityChart({
       accessibilityLabel="Hourly activity distribution showing messages, reactions, and threads"
       rightContent={
         <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2 text-white/70" role="status" aria-label="Selected date">
+          <div
+            className="flex items-center space-x-2 text-white/70"
+            role="status"
+            aria-label="Selected date"
+          >
             <ClockIcon className="w-5 h-5" aria-hidden="true" />
             <span className="text-sm">{selectedDate}</span>
           </div>
-          <div 
+          <div
             className="px-2 py-1 rounded-lg bg-cyan-500/10 text-cyan-400 text-sm"
             role="status"
             aria-label={`Average hourly activity: ${formatValue(metrics.avgActivity, 'activity')}`}
@@ -237,18 +280,18 @@ export default function HourlyActivityChart({
         {/* Activity distribution summary */}
         <div className="grid grid-cols-3 gap-4">
           {Object.entries(metrics.totals).map(([key, value]) => (
-            <div 
-              key={key} 
+            <div
+              key={key}
               className={`p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors ${
                 highlightedData?.key === 'category' && highlightedData.value === key
                   ? 'ring-2 ring-accent/50'
                   : ''
               }`}
             >
-              <div className="text-sm text-white/70">{categoryLabels[key as keyof typeof categoryLabels]}</div>
-              <div className="text-lg font-medium text-white">
-                {formatValue(value, 'activity')}
+              <div className="text-sm text-white/70">
+                {categoryLabels[key as keyof typeof categoryLabels]}
               </div>
+              <div className="text-lg font-medium text-white">{formatValue(value, 'activity')}</div>
               <div className="text-sm text-white/50 mt-1">
                 {((value / totalActivity) * 100).toFixed(1)}% of total
               </div>
@@ -258,7 +301,7 @@ export default function HourlyActivityChart({
 
         {/* Main chart */}
         <BarChart
-          data={data}
+          data={transformedData}
           index="hour"
           categories={visibleCategories}
           colors={colors}
@@ -267,21 +310,12 @@ export default function HourlyActivityChart({
           startEndOnly={false}
           showAnimation={hiddenSeries.length === 0}
           className={`${chartStyles.barChart.className} ${highlightTransitionStyles} ${
-            highlightedHour || (highlightedData?.key === 'hour')
+            highlightedHour || highlightedData?.key === 'hour'
               ? '[&_.tremor-BarChart-bar]:transition-all [&_.tremor-BarChart-bar]:duration-300 [&_.tremor-BarChart-bar]:ease-in-out'
               : ''
           }`}
           valueFormatter={value => formatValue(value, 'activity')}
-          onValueChange={v => {
-            setSelectedBar(v ? String(v.hour) : null);
-            if (v) {
-              setHighlightedHour(String(v.hour));
-              onHighlightChange?.({ key: 'hour', value: String(v.hour) });
-            } else {
-              setHighlightedHour(null);
-              onHighlightChange?.({ key: '', value: '' });
-            }
-          }}
+          onValueChange={handleValueChange}
           customTooltip={CustomTooltip}
           yAxisWidth={56}
           enableLegendSlider={false}
@@ -294,4 +328,4 @@ export default function HourlyActivityChart({
       </div>
     </BaseChart>
   );
-} 
+}

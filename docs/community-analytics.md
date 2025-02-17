@@ -1,12 +1,85 @@
+# Community Analytics Documentation
+
+## Overview
+
+This documentation covers the community analytics features, including metrics calculation, data visualization, and health scoring.
+
+## Community Health Score
+
+The Community Health Score is a composite metric that provides a holistic view of community health, calculated on a scale of 0-100. The score is weighted across three key dimensions:
+
+### Score Components
+
+1. **Sentiment Score (40% weight)**
+
+   - Measures the overall sentiment of community interactions
+   - Based on the ratio of positive, neutral, and negative sentiment
+   - Normalized to a 0-100 scale
+
+2. **Engagement Rate (30% weight)**
+
+   - Measures active participation and interaction levels
+   - Direct percentage value from platform metrics
+   - Scale: 0-100%
+
+3. **Growth Rate (30% weight)**
+   - Measures community expansion and retention
+   - Normalized against a 20% benchmark for healthy growth
+   - Converted to a 0-100 scale
+
+### Calculation Method
+
+The final health score is calculated using the following steps:
+
+1. Each component is weighted according to its importance
+2. Scores are normalized to ensure consistent scaling
+3. Components are combined and rounded to the nearest integer
+4. Final score is capped between 0 and 100
+
+### Score Interpretation
+
+- **90-100**: Exceptional community health
+- **80-89**: Very healthy community (current score: 87.0)
+- **70-79**: Healthy community
+- **60-69**: Moderate health, room for improvement
+- **Below 60**: Requires attention and intervention
+
+## Data Sources
+
+The analytics dashboard aggregates data from multiple platforms:
+
+- Discord
+- Telegram
+- Twitter
+
+Each platform provides metrics for:
+
+- Member/follower count
+- Active users
+- Message volume
+- Engagement rates
+- Sentiment analysis
+- Growth trends
+
+## Metrics Validation
+
+All metrics undergo validation before being used in calculations:
+
+- Required fields must be present
+- Values must be within expected ranges
+- Trend data must have valid directional indicators
+
 # Community Analytics
 
 ## Quick Start
+
 - [Setup Guide](#setup-guide)
 - [Common Tasks](#common-tasks)
 - [Troubleshooting](#troubleshooting)
 - [API Reference](#api-reference)
 
 ### Quick "Hello World" Example
+
 ```tsx
 // 1. Install dependencies
 pnpm install @tremor/react framer-motion swr
@@ -36,6 +109,7 @@ export function BasicMetrics() {
 ```
 
 ## Table of Contents
+
 1. [Overview](#overview)
 2. [Setup Guide](#setup-guide)
 3. [Features & Implementation](#features)
@@ -53,24 +127,23 @@ export function BasicMetrics() {
 7. [Troubleshooting](#troubleshooting)
 8. [Contributing](#contributing)
 
-## Overview
-
-The Community Analytics module provides real-time insights into community engagement, growth, and health across multiple platforms. This guide will help you understand, use, and contribute to the module effectively.
-
 ## Setup Guide
 
 1. **Install Dependencies**:
+
 ```bash
 pnpm install @tremor/react framer-motion swr
 ```
 
 2. **Configure Environment**:
+
 ```env
 NEXT_PUBLIC_API_BASE_URL=http://localhost:3000/api
 NEXT_PUBLIC_CACHE_DURATION=300
 ```
 
 3. **Import Required Components**:
+
 ```typescript
 import { useCommunityData } from '@/hooks/useCommunityData';
 import { CommunityMetrics } from '@/types/community';
@@ -82,28 +155,22 @@ import { BaseChart, SentimentChart } from '@/components/charts';
 ### Performance Optimizations
 
 #### Data Fetching Strategy
+
 ```typescript
 // hooks/useCommunityData.ts
 export function useCommunityData(options: DataOptions = {}) {
-  const { 
-    platform = 'all',
-    timeRange = '24h',
-    forceRefresh = false
-  } = options;
+  const { platform = 'all', timeRange = '24h', forceRefresh = false } = options;
 
-  return useSWR(
-    ['/api/community/metrics', platform, timeRange],
-    fetchWithCache,
-    {
-      revalidateOnFocus: false,
-      dedupingInterval: 60000,
-      fallbackData: getCachedData(platform, timeRange)
-    }
-  );
+  return useSWR(['/api/community/metrics', platform, timeRange], fetchWithCache, {
+    revalidateOnFocus: false,
+    dedupingInterval: 60000,
+    fallbackData: getCachedData(platform, timeRange),
+  });
 }
 ```
 
 #### Optimized Rendering
+
 ```typescript
 // components/charts/CommunityChart.tsx
 export function CommunityChart({ data }: Props) {
@@ -137,6 +204,7 @@ export function CommunityChart({ data }: Props) {
 ### Data Visualization
 
 #### Chart Configuration
+
 ```typescript
 // config/chartConfig.ts
 export const chartOptions = {
@@ -144,27 +212,28 @@ export const chartOptions = {
   maintainAspectRatio: false,
   animation: {
     duration: 400,
-    easing: 'easeOutQuart'
+    easing: 'easeOutQuart',
   },
   plugins: {
     legend: {
       position: 'bottom' as const,
       labels: {
-        color: 'rgba(255, 255, 255, 0.7)'
-      }
+        color: 'rgba(255, 255, 255, 0.7)',
+      },
     },
     tooltip: {
       backgroundColor: 'rgba(0, 0, 0, 0.8)',
       titleColor: 'rgba(255, 255, 255, 0.9)',
       bodyColor: 'rgba(255, 255, 255, 0.7)',
       borderColor: 'rgba(135, 250, 253, 0.2)',
-      borderWidth: 1
-    }
-  }
+      borderWidth: 1,
+    },
+  },
 };
 ```
 
 #### Accessibility Support
+
 ```typescript
 // components/charts/BaseChart.tsx
 export function BaseChart({ data, options, ...props }: BaseChartProps) {
@@ -208,6 +277,7 @@ export function BaseChart({ data, options, ...props }: BaseChartProps) {
 ## Common Tasks
 
 ### 1. Add a New Metric
+
 ```typescript
 // 1. Add type definition
 interface NewMetric {
@@ -237,14 +307,15 @@ function MetricCard({ metric }: { metric: NewMetric }) {
 ```
 
 ### 2. Implement Data Export
+
 ```typescript
 async function exportData(timeRange: string) {
   const data = await fetchCommunityData(timeRange);
   const csv = convertToCSV(data);
-  
+
   const blob = new Blob([csv], { type: 'text/csv' });
   const url = URL.createObjectURL(blob);
-  
+
   const link = document.createElement('a');
   link.href = url;
   link.download = `community-data-${timeRange}.csv`;
@@ -260,36 +331,41 @@ async function exportData(timeRange: string) {
 ### Common Issues
 
 1. **Charts Not Rendering or Showing "No Data"**
+
    - **Symptoms**:
      - Empty charts
      - "No Data" placeholder
      - Blank spaces where charts should be
    - **Solutions**:
+
      ```typescript
      // 1. Check API configuration
      console.log(process.env.NEXT_PUBLIC_API_BASE_URL); // Should match your API
-     
+
      // 2. Verify data availability
      const { data, error } = useCommunityData();
      console.log('Data:', data, 'Error:', error);
-     
+
      // 3. Check time range validity
      const validTimeRanges = ['24h', '7d', '30d', '90d'];
      if (!validTimeRanges.includes(timeRange)) {
        console.error('Invalid time range:', timeRange);
      }
      ```
+
    - **Prevention**:
      - Always validate environment variables during setup
      - Implement proper loading states
      - Add data validation before rendering
 
 2. **Infinite Loading States**
+
    - **Symptoms**:
      - Perpetual loading spinner
      - No error messages
      - UI stuck in loading state
    - **Solutions**:
+
      ```typescript
      // 1. Add timeout to useSWR
      const { data, error } = useSWR(key, fetcher, {
@@ -299,38 +375,42 @@ async function exportData(timeRange: string) {
          console.warn('Slow loading detected');
        }
      });
-     
+
      // 2. Implement error boundaries
      <ErrorBoundary fallback={<ErrorMessage />}>
        <CommunityChart data={data} />
      </ErrorBoundary>
      ```
+
    - **Prevention**:
      - Set appropriate timeouts
      - Implement loading fallbacks
      - Add error boundaries
 
 3. **Data Not Updating with Filters**
+
    - **Symptoms**:
      - Stale data after filter changes
      - Inconsistent updates
      - Missing data for certain filters
    - **Solutions**:
+
      ```typescript
      // 1. Verify dependency array
      useEffect(() => {
        refetch(); // Trigger manual refetch
      }, [timeRange, platform]); // Include all filter dependencies
-     
+
      // 2. Clear cache when needed
      const handleFilterChange = () => {
        mutate(null); // Clear cache
        setTimeRange(newRange);
      };
-     
+
      // 3. Debug rerender triggers
      console.log('Render:', { timeRange, platform, data });
      ```
+
    - **Prevention**:
      - Properly manage dependencies
      - Implement proper cache invalidation
@@ -342,6 +422,7 @@ async function exportData(timeRange: string) {
      - UI lag when filtering
      - High memory usage
    - **Solutions**:
+
      ```typescript
      // 1. Implement data sampling
      const sampledData = useMemo(() => {
@@ -350,13 +431,14 @@ async function exportData(timeRange: string) {
        }
        return data;
      }, [data]);
-     
+
      // 2. Optimize rerenders
      const MemoizedChart = memo(CommunityChart);
-     
+
      // 3. Use windowing for large lists
      import { VirtualList } from '@/components/VirtualList';
      ```
+
    - **Prevention**:
      - Monitor performance metrics
      - Implement data sampling
@@ -367,6 +449,7 @@ async function exportData(timeRange: string) {
 ### Development Workflow
 
 1. **Setup**
+
    ```bash
    git checkout -b feature/new-metric
    pnpm install
@@ -374,12 +457,14 @@ async function exportData(timeRange: string) {
    ```
 
 2. **Testing**
+
    ```bash
    pnpm test
    pnpm test:coverage
    ```
 
 3. **Documentation**
+
    - Update relevant .md files
    - Add JSDoc comments
    - Include code examples
@@ -394,7 +479,9 @@ async function exportData(timeRange: string) {
 ## Maintenance Guidelines
 
 ### Documentation Updates
+
 1. **When to Update**:
+
    - Adding new features or components
    - Modifying existing functionality
    - Fixing bugs that affect usage
@@ -402,6 +489,7 @@ async function exportData(timeRange: string) {
    - Adding new best practices
 
 2. **Review Process**:
+
    - Documentation changes require PR review
    - Include screenshots/videos for visual changes
    - Update all affected documentation files
@@ -410,6 +498,7 @@ async function exportData(timeRange: string) {
    - Update version numbers and changelog
 
 3. **Quality Checklist**:
+
    - [ ] Code examples are complete and runnable
    - [ ] All imports are specified
    - [ ] Type definitions are included

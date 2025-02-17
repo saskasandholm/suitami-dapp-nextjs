@@ -1,13 +1,18 @@
 import { NextResponse } from 'next/server';
 import {
   generateMockPlatformMetrics,
-  generateMockAllPlatformMetrics
+  generateMockAllPlatformMetrics,
 } from '@/mocks/communityMockData';
+import type { CommunityMetrics } from '@/types/community';
 
 const ARTIFICIAL_DELAY = 500;
 
 async function delay(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function validateMetrics(metrics: CommunityMetrics): boolean {
+  return !!(metrics.sentiment?.score && metrics.engagement?.rate && metrics.growth?.rate);
 }
 
 export async function GET(request: Request) {
@@ -16,18 +21,23 @@ export async function GET(request: Request) {
 
     const { searchParams } = new URL(request.url);
     const platform = searchParams.get('platform') || 'all';
-    const _timeRange = searchParams.get('timeRange') || '24h';
+    const timeRange = searchParams.get('timeRange') || '24h';
 
-    const response = platform === 'all'
-      ? generateMockAllPlatformMetrics()
-      : generateMockPlatformMetrics(platform);
+    console.log(`[API] Generating metrics for platform: ${platform}, timeRange: ${timeRange}`);
 
-    return NextResponse.json(response);
+    const metrics =
+      platform === 'all' ? generateMockAllPlatformMetrics() : generateMockPlatformMetrics(platform);
+
+    console.log(`[API] Generated metrics:`, JSON.stringify(metrics, null, 2));
+
+    if (!validateMetrics(metrics)) {
+      console.error('[API] Invalid metrics data:', metrics);
+      return NextResponse.json({ error: 'Invalid metrics data' }, { status: 400 });
+    }
+
+    return NextResponse.json(metrics);
   } catch (error) {
-    console.error('API Error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    console.error('[API] Error generating metrics:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-} 
+}

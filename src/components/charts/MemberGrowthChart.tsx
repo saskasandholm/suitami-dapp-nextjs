@@ -2,7 +2,8 @@ import { AreaChart } from '@tremor/react';
 import { motion } from 'framer-motion';
 import { CalendarIcon, ArrowTrendingUpIcon } from '@heroicons/react/24/outline';
 import { useState, useMemo } from 'react';
-import BaseChart, { chartStyles, InsightType } from './BaseChart';
+import BaseChart, { InsightType } from './BaseChart';
+import { chartStyles } from '@/styles/chartStyles';
 import CustomTooltip from '@/components/common/CustomTooltip';
 import { formatValue } from '@/utils/formatters';
 import type { EventProps } from '@tremor/react';
@@ -36,17 +37,22 @@ interface EnrichedMemberData extends MemberData {
 }
 
 // Add a helper function to calculate percentage change
-const calculatePercentChange = (current: number, previous: number) => {
+const calculatePercentChange = (current: number, previous: number): number => {
   if (previous === 0) return 0;
   return ((current - previous) / previous) * 100;
 };
 
-export default function MemberGrowthChart({ 
-  data, 
+// Add a helper function to calculate active ratio
+const calculateActiveRatio = (active: number, total: number): number => {
+  return Number(((active / total) * 100).toFixed(1));
+};
+
+export default function MemberGrowthChart({
+  data,
   selectedRange,
   onHighlightChange,
   highlightedData,
-  chartId = 'member-growth'
+  chartId = 'member-growth',
 }: MemberGrowthChartProps) {
   const [selectedPoint, setSelectedPoint] = useState<string | null>(null);
   const [hiddenSeries, setHiddenSeries] = useState<string[]>([]);
@@ -60,12 +66,13 @@ export default function MemberGrowthChart({
     const latest = data[data.length - 1];
     const earliest = data[0];
     const previousPeriod = data[Math.floor(data.length / 2)];
-    
+
     const growth = {
-      total: ((latest.total - earliest.total) / earliest.total * 100).toFixed(1),
-      active: ((latest.active - earliest.active) / earliest.active * 100).toFixed(1),
+      total: Number((((latest.total - earliest.total) / earliest.total) * 100).toFixed(1)),
+      active: Number((((latest.active - earliest.active) / earliest.active) * 100).toFixed(1)),
       new: latest.new,
-      recentTrend: ((latest.total - previousPeriod.total) / (previousPeriod.total - earliest.total) - 1) * 100
+      recentTrend:
+        ((latest.total - previousPeriod.total) / (previousPeriod.total - earliest.total) - 1) * 100,
     };
 
     return growth;
@@ -74,7 +81,7 @@ export default function MemberGrowthChart({
   // Generate enhanced insights based on the data
   const insights = useMemo(() => {
     const insights: InsightType[] = [];
-    
+
     // Growth trend insight (High priority with action)
     if (metrics.recentTrend > 10) {
       insights.push({
@@ -85,18 +92,20 @@ export default function MemberGrowthChart({
         relatedData: {
           trend: metrics.recentTrend,
           currentGrowth: metrics.total,
-          details: 'Click to see detailed growth breakdown'
+          details: 'Click to see detailed growth breakdown',
         },
         highlightData: {
           key: 'period',
-          value: 'recent'
+          value: 'recent',
         },
-        relatedCharts: [{
-          chartId: 'hourly-activity',
-          insight: 'Check activity patterns during high-growth periods',
-          chartType: 'bar',
-          color: 'text-cyan-400'
-        }]
+        relatedCharts: [
+          {
+            chartId: 'hourly-activity',
+            insight: 'Check activity patterns during high-growth periods',
+            chartType: 'bar',
+            color: 'text-cyan-400',
+          },
+        ],
       });
     } else if (metrics.recentTrend < -10) {
       insights.push({
@@ -107,23 +116,26 @@ export default function MemberGrowthChart({
         relatedData: {
           trend: metrics.recentTrend,
           currentGrowth: metrics.total,
-          details: 'Click to see potential factors'
+          details: 'Click to see potential factors',
         },
         highlightData: {
           key: 'period',
-          value: 'recent'
+          value: 'recent',
         },
-        relatedCharts: [{
-          chartId: 'sentiment',
-          insight: 'Check if sentiment trends correlate with slowing growth',
-          chartType: 'sentiment',
-          color: 'text-yellow-400'
-        }]
+        relatedCharts: [
+          {
+            chartId: 'sentiment',
+            insight: 'Check if sentiment trends correlate with slowing growth',
+            chartType: 'sentiment',
+            color: 'text-yellow-400',
+          },
+        ],
       });
     }
-    
+
     // Active members insight (Medium priority)
-    const activeRatio = Number((data[data.length - 1].active / data[data.length - 1].total * 100).toFixed(1));
+    const lastDataPoint = data[data.length - 1];
+    const activeRatio = calculateActiveRatio(lastDataPoint.active, lastDataPoint.total);
     insights.push({
       text: `${activeRatio}% of total members are currently active`,
       priority: 'medium' as const,
@@ -131,46 +143,54 @@ export default function MemberGrowthChart({
       isExpandable: true,
       relatedData: {
         activeRatio,
-        totalMembers: data[data.length - 1].total,
-        activeMembers: data[data.length - 1].active,
-        trend: 'Click to see activity trends'
+        totalMembers: lastDataPoint.total,
+        activeMembers: lastDataPoint.active,
+        details: 'Click to see activity trends',
+        trend: activeRatio,
       },
       highlightData: {
         key: 'category',
-        value: 'active'
+        value: 'active',
       },
-      relatedCharts: [{
-        chartId: 'hourly-activity',
-        insight: 'View hourly patterns of active members',
-        chartType: 'bar',
-        color: 'text-cyan-400'
-      }]
+      relatedCharts: [
+        {
+          chartId: 'hourly-activity',
+          insight: 'View hourly patterns of active members',
+          chartType: 'bar',
+          color: 'text-cyan-400',
+        },
+      ],
     });
-    
+
     // New members insight (Medium/Low priority based on volume)
     if (metrics.new > 0) {
       insights.push({
         text: `${formatValue(metrics.new, 'members')} new members joined in this period`,
-        priority: metrics.new > 100 ? 'medium' as const : 'low' as const,
+        priority: metrics.new > 100 ? ('medium' as const) : ('low' as const),
         isExpandable: true,
         relatedData: {
           newMembers: metrics.new,
-          joinDates: 'Click to see join date distribution'
+          joinDates: 'Click to see join date distribution',
         },
         highlightData: {
           key: 'category',
-          value: 'new'
-        }
+          value: 'new',
+        },
       });
     }
-    
+
     return insights;
   }, [data, metrics]);
 
   // Handle insight click for drill-down and highlighting
   const handleInsightClick = (insight: InsightType | null) => {
     if (insight?.highlightData) {
-      setHighlightedPeriod(insight.highlightData.key === 'period' ? insight.highlightData.value : null);
+      const value = insight.highlightData.value;
+      setHighlightedPeriod(
+        insight.highlightData.key === 'period' && (value === 'recent' || value === 'all')
+          ? value
+          : null
+      );
       onHighlightChange?.(insight.highlightData);
     } else {
       setHighlightedPeriod(null);
@@ -179,11 +199,7 @@ export default function MemberGrowthChart({
   };
 
   const handleLegendClick = (item: string) => {
-    setHiddenSeries(prev => 
-      prev.includes(item) 
-        ? prev.filter(i => i !== item)
-        : [...prev, item]
-    );
+    setHiddenSeries(prev => (prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]));
   };
 
   const visibleCategories = categories.filter(cat => !hiddenSeries.includes(cat));
@@ -192,7 +208,7 @@ export default function MemberGrowthChart({
   const categoryLabels = {
     total: 'Total Members',
     active: 'Active Members',
-    new: 'New Members'
+    new: 'New Members',
   };
 
   // Use a stable timestamp for lastUpdated
@@ -215,7 +231,7 @@ export default function MemberGrowthChart({
       const midPoint = Math.floor(data.length / 2);
       return {
         start: data[midPoint].date,
-        end: data[data.length - 1].date
+        end: data[data.length - 1].date,
       };
     }
     return null;
@@ -236,21 +252,25 @@ export default function MemberGrowthChart({
         ...point,
         enrichedValues: {
           total: {
-            percentChange: previousPoint ? calculatePercentChange(point.total, previousPoint.total) : 0,
+            percentChange: previousPoint
+              ? calculatePercentChange(point.total, previousPoint.total)
+              : 0,
             benchmark: { type: 'average' as const, value: avgTotal },
-            context: `${point.total > avgTotal ? 'Above' : 'Below'} average by ${Math.abs(((point.total - avgTotal) / avgTotal) * 100).toFixed(1)}%`
+            context: `${point.total > avgTotal ? 'Above' : 'Below'} average by ${Math.abs(((point.total - avgTotal) / avgTotal) * 100).toFixed(1)}%`,
           },
           active: {
-            percentChange: previousPoint ? calculatePercentChange(point.active, previousPoint.active) : 0,
+            percentChange: previousPoint
+              ? calculatePercentChange(point.active, previousPoint.active)
+              : 0,
             benchmark: { type: 'average' as const, value: avgActive },
-            context: `${((point.active / point.total) * 100).toFixed(1)}% of total members are active`
+            context: `${((point.active / point.total) * 100).toFixed(1)}% of total members are active`,
           },
           new: {
             percentChange: previousPoint ? calculatePercentChange(point.new, previousPoint.new) : 0,
             benchmark: { type: 'average' as const, value: avgNew },
-            context: point.new > avgNew ? 'Above average new members' : 'Below average new members'
-          }
-        }
+            context: point.new > avgNew ? 'Above average new members' : 'Below average new members',
+          },
+        },
       };
     });
   }, [data]) as EnrichedMemberData[];
@@ -260,16 +280,19 @@ export default function MemberGrowthChart({
     if (!category) return formatValue(value, 'members');
     const point = enrichedData.find(d => d[category as keyof MemberData] === value);
     if (!point) return formatValue(value, 'members');
-    
+
     const enrichedValue = point.enrichedValues[category];
     // Attach enriched data to the DOM element for the tooltip to use
     const element = document.querySelector(`[data-value="${value}"]`);
     if (element) {
-      element.setAttribute('data-enriched', JSON.stringify({
-        percentChange: enrichedValue.percentChange,
-        benchmark: enrichedValue.benchmark,
-        context: enrichedValue.context
-      }));
+      element.setAttribute(
+        'data-enriched',
+        JSON.stringify({
+          percentChange: enrichedValue.percentChange,
+          benchmark: enrichedValue.benchmark,
+          context: enrichedValue.context,
+        })
+      );
     }
     return formatValue(value, 'members');
   };
@@ -281,12 +304,16 @@ export default function MemberGrowthChart({
       accessibilityLabel="Member growth chart showing total, active, and new members over time"
       rightContent={
         <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2 text-white/70" role="status" aria-label="Selected time range">
+          <div
+            className="flex items-center space-x-2 text-white/70"
+            role="status"
+            aria-label="Selected time range"
+          >
             <CalendarIcon className="w-5 h-5" aria-hidden="true" />
             <span className="text-sm">{selectedRange}</span>
           </div>
           {metrics.total && Number(metrics.total) > 0 && (
-            <div 
+            <div
               className="flex items-center space-x-2 px-2 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 text-sm"
               role="status"
               aria-label={`Growth rate: ${metrics.total}%`}
@@ -306,35 +333,40 @@ export default function MemberGrowthChart({
       <div role="region" aria-label="Member growth chart" className="space-y-6">
         {/* Key metrics summary */}
         <div className="grid grid-cols-3 gap-4">
-          {Object.entries(metrics).filter(([key]) => key !== 'recentTrend').map(([key, value]) => (
-            <div 
-              key={key} 
-              className={`p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors ${
-                highlightedData?.key === 'category' && highlightedData.value === key
-                  ? 'ring-2 ring-accent/50'
-                  : ''
-              }`}
-            >
-              <div className="text-sm text-white/70">{categoryLabels[key as keyof typeof categoryLabels]}</div>
-              <div className="text-lg font-medium text-white">
-                {formatValue(Number(value), key === 'total' ? 'members' : key === 'active' ? 'members' : 'growth')}
-              </div>
-              {key !== 'new' && (
-                <div className="text-sm text-white/50 mt-1">
-                  vs. previous period
+          {Object.entries(metrics)
+            .filter(([key]) => key !== 'recentTrend')
+            .map(([key, value]) => (
+              <div
+                key={key}
+                className={`p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors ${
+                  highlightedData?.key === 'category' && highlightedData.value === key
+                    ? 'ring-2 ring-accent/50'
+                    : ''
+                }`}
+              >
+                <div className="text-sm text-white/70">
+                  {categoryLabels[key as keyof typeof categoryLabels]}
                 </div>
-              )}
-            </div>
-          ))}
+                <div className="text-lg font-medium text-white">
+                  {formatValue(
+                    Number(value),
+                    key === 'total' ? 'members' : key === 'active' ? 'members' : 'growth'
+                  )}
+                </div>
+                {key !== 'new' && (
+                  <div className="text-sm text-white/50 mt-1">vs. previous period</div>
+                )}
+              </div>
+            ))}
         </div>
 
         {/* Main chart */}
         <div className="relative">
           {highlightedPeriod === 'recent' && (
-            <div 
+            <div
               className="absolute inset-0 bg-gradient-to-l from-accent/10 via-accent/5 to-transparent pointer-events-none z-10 transition-opacity duration-300"
               style={{
-                clipPath: 'polygon(50% 0, 100% 0, 100% 100%, 50% 100%)'
+                clipPath: 'polygon(50% 0, 100% 0, 100% 100%, 50% 100%)',
               }}
             />
           )}
@@ -374,4 +406,4 @@ export default function MemberGrowthChart({
       </div>
     </BaseChart>
   );
-} 
+}

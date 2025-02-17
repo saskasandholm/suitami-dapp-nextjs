@@ -50,6 +50,7 @@
   .text-gradient {
     background: linear-gradient(to right, #fff, #87fafd);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
@@ -89,7 +90,7 @@
   }
 }
 
-/* Tremor overrides */
+/* Tremor Base Component Overrides */
 .tremor-Card-root {
   @apply bg-black/20 backdrop-blur-lg border border-white/10 !important;
 }
@@ -98,6 +99,7 @@
   @apply bg-black/20 backdrop-blur-lg border border-white/10 !important;
 }
 
+/* Tremor Navigation Overrides */
 .tremor-TabList-root {
   @apply border-white/10 !important;
 }
@@ -110,15 +112,64 @@
   @apply text-accent border-accent !important;
 }
 
+/* Tremor Chart Base Styles */
 .tremor-AreaChart-root,
 .tremor-BarChart-root {
   @apply text-white/70 !important;
 }
 
+/* Tremor Chart Color Overrides */
+/* Area Chart */
+.tremor-AreaChart-path[data-key='positive'] {
+  fill: var(--chart-emerald-fill) !important;
+  stroke: var(--chart-emerald-stroke) !important;
+}
+
+.tremor-AreaChart-path[data-key='neutral'] {
+  fill: var(--chart-slate-fill) !important;
+  stroke: var(--chart-slate-stroke) !important;
+}
+
+.tremor-AreaChart-path[data-key='negative'] {
+  fill: var(--chart-rose-fill) !important;
+  stroke: var(--chart-rose-stroke) !important;
+}
+
+/* Legend */
 .tremor-Legend-root {
   @apply text-white/70 !important;
 }
 
+.tremor-Legend-list-item[data-key='positive'] {
+  color: var(--chart-emerald-text) !important;
+}
+
+.tremor-Legend-list-item[data-key='neutral'] {
+  color: var(--chart-slate-text) !important;
+}
+
+.tremor-Legend-list-item[data-key='negative'] {
+  color: var(--chart-rose-text) !important;
+}
+
+/* Donut Chart */
+.tremor-DonutChart {
+  @apply !h-[300px] !w-[300px] !mx-auto;
+}
+
+.tremor-DonutChart-path[data-key='positive'] {
+  fill: var(--chart-emerald) !important;
+}
+
+.tremor-DonutChart-path[data-key='neutral'] {
+  fill: var(--chart-slate) !important;
+}
+
+.tremor-DonutChart-path[data-key='negative'] {
+  fill: var(--chart-rose) !important;
+}
+
+/* Tremor Typography */
 .tremor-Title-root,
 .tremor-Text-root {
   @apply text-white/90 !important;

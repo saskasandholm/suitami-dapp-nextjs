@@ -18,11 +18,14 @@ interface CacheConfig {
 function getCacheKey(baseKey: string, params: Record<string, any>): string {
   const sortedParams = Object.keys(params)
     .sort()
-    .reduce((acc, key) => {
-      acc[key] = params[key];
-      return acc;
-    }, {} as Record<string, any>);
-  
+    .reduce(
+      (acc, key) => {
+        acc[key] = params[key];
+        return acc;
+      },
+      {} as Record<string, any>
+    );
+
   const paramString = JSON.stringify(sortedParams);
   return `${CACHE_PREFIX}${baseKey}_${paramString}`;
 }
@@ -64,24 +67,21 @@ const BASE_URL = '/api/community';
 
 // Error type
 export class ApiError extends Error {
-  constructor(public status: number, message: string) {
+  constructor(
+    public status: number,
+    message: string
+  ) {
     super(message);
     this.name = 'ApiError';
   }
 }
 
 // Fetch wrapper with error handling
-async function fetchWithErrorHandling<T>(
-  url: string,
-  options?: RequestInit
-): Promise<T> {
+async function fetchWithErrorHandling<T>(url: string, options?: RequestInit): Promise<T> {
   try {
     const response = await fetch(url, options);
     if (!response.ok) {
-      throw new ApiError(
-        response.status,
-        `API request failed: ${response.statusText}`
-      );
+      throw new ApiError(response.status, `API request failed: ${response.statusText}`);
     }
     return response.json();
   } catch (error) {
@@ -102,10 +102,28 @@ export async function fetchCommunityMetrics(
   const cached = getCache<CommunityMetrics>(cacheKey, config);
   if (cached) return cached;
 
-  const url = `${BASE_URL}/metrics?platform=${platform}&timeRange=${timeRange}`;
-  const data = await fetchWithErrorHandling<CommunityMetrics>(url);
-  setCache(cacheKey, data);
-  return data;
+  try {
+    const response = await fetch(
+      `/api/community/metrics?platform=${platform}&timeRange=${timeRange}`
+    );
+    if (!response.ok) {
+      throw new ApiError(response.status, `API request failed: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    if (!data || !data.sentiment || !data.engagement || !data.growth) {
+      console.error('Invalid metrics data:', data);
+      throw new ApiError(400, 'Invalid metrics data: Missing required fields');
+    }
+
+    setCache(cacheKey, data);
+    return data;
+  } catch (error) {
+    console.error('Error fetching community metrics:', error);
+    throw error instanceof ApiError
+      ? error
+      : new ApiError(500, 'Failed to fetch metrics: Network error');
+  }
 }
 
 export async function fetchSentimentData(
@@ -161,7 +179,7 @@ export function getCacheMetrics(): {
       size: 0,
       entries: 0,
       oldestEntry: Date.now(),
-      newestEntry: 0
+      newestEntry: 0,
     };
 
     const keys = Object.keys(localStorage);
@@ -185,7 +203,7 @@ export function getCacheMetrics(): {
       size: 0,
       entries: 0,
       oldestEntry: Date.now(),
-      newestEntry: Date.now()
+      newestEntry: Date.now(),
     };
   }
 }
@@ -207,4 +225,4 @@ export function getCacheStatus(): Record<string, number> {
     console.warn('Failed to get cache status:', error);
   }
   return status;
-} 
+}

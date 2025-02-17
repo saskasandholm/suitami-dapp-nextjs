@@ -1,13 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import {
-  Card,
-  Title,
-  Text,
-  DonutChart,
-  AreaChart,
-} from '@tremor/react';
+import { Card, Title, Text, DonutChart, AreaChart } from '@tremor/react';
 import { motion } from 'framer-motion';
 import {
   UserGroupIcon,
@@ -30,6 +24,8 @@ import PageHeader from '@/components/layout/PageHeader';
 import MemberGrowthChart from '@/components/charts/MemberGrowthChart';
 import HourlyActivityChart from '@/components/charts/HourlyActivityChart';
 import TrendingTopicsChart from '@/components/charts/TrendingTopicsChart';
+import SentimentChart from '@/components/charts/SentimentChart';
+import CurrentSentimentChart from '@/components/charts/CurrentSentimentChart';
 
 // Time range options for analytics
 const timeRanges: { label: string; value: TimeRange }[] = [
@@ -37,7 +33,7 @@ const timeRanges: { label: string; value: TimeRange }[] = [
   { label: '7d', value: '7d' },
   { label: '30d', value: '30d' },
   { label: '90d', value: '90d' },
-  { label: 'Custom', value: 'custom' }
+  { label: 'Custom', value: 'custom' },
 ];
 
 type PlatformName = 'telegram' | 'discord' | 'twitter';
@@ -243,7 +239,7 @@ const platformLinks = {
  * Detects anomalies in a dataset using z-score analysis.
  * A z-score measures how many standard deviations a data point is from the mean.
  * Values beyond the threshold are considered anomalies.
- * 
+ *
  * @param data - Array of numerical values to analyze
  * @param threshold - Z-score threshold for anomaly detection (default: 2 std deviations)
  * @returns Array of booleans indicating which values are anomalies
@@ -262,61 +258,83 @@ const detectAnomalies = (data: number[], threshold: number = ANOMALY_THRESHOLD) 
  * - Sentiment score (40%): Community sentiment and satisfaction
  * - Engagement rate (30%): Active participation and interaction levels
  * - Growth rate (30%): Member/follower growth across platforms
- * 
+ *
  * @param metrics - Platform-specific metrics for all platforms
  * @returns A health score between 0-100
  */
 const calculateHealthScore = (metrics: CommunityMetrics): number => {
+  console.log('Calculating health score with metrics:', JSON.stringify(metrics, null, 2));
+
+  if (!metrics) {
+    console.warn('No metrics data available');
+    return 0;
+  }
+
+  // Initialize weights
   const weights = {
-    sentiment: 0.4,
-    engagement: 0.3,
-    growth: 0.3
+    sentiment: 0.4, // 40%
+    engagement: 0.3, // 30%
+    growth: 0.3, // 30%
   };
 
-  let score = 0;
-  let totalWeight = 0;
+  let totalScore = 0;
+  let appliedWeights = 0;
 
   // Calculate sentiment score (40%)
-  if (metrics.sentiment) {
-    totalWeight += weights.sentiment;
-    
-    // Use the sentiment score directly if available
-    if (metrics.sentiment.score) {
-      score += metrics.sentiment.score * weights.sentiment;
-    } else {
-      // Calculate from components if no direct score
-      const total = metrics.sentiment.positive + metrics.sentiment.neutral + metrics.sentiment.negative;
-      if (total > 0) {
-        const sentimentScore = (
-          (metrics.sentiment.positive * 1) +
-          (metrics.sentiment.neutral * 0.5) +
-          (metrics.sentiment.negative * 0)
-        ) / total;
-        score += sentimentScore * 100 * weights.sentiment;
-      }
-    }
+  if (metrics.sentiment?.score) {
+    totalScore += metrics.sentiment.score * weights.sentiment;
+    appliedWeights += weights.sentiment;
+    console.log(
+      'Applied sentiment score:',
+      metrics.sentiment.score,
+      'with weight:',
+      weights.sentiment
+    );
+  } else {
+    console.warn('No valid sentiment score available');
   }
 
   // Calculate engagement score (30%)
   if (metrics.engagement?.rate) {
-    totalWeight += weights.engagement;
-    score += metrics.engagement.rate * weights.engagement;
+    totalScore += metrics.engagement.rate * weights.engagement;
+    appliedWeights += weights.engagement;
+    console.log(
+      'Applied engagement rate:',
+      metrics.engagement.rate,
+      'with weight:',
+      weights.engagement
+    );
+  } else {
+    console.warn('No valid engagement rate available');
   }
 
   // Calculate growth score (30%)
   if (metrics.growth?.rate) {
-    totalWeight += weights.growth;
     // Normalize growth rate (assuming max healthy growth is 20%)
     const normalizedGrowth = Math.min(metrics.growth.rate / 20, 1);
-    score += normalizedGrowth * 100 * weights.growth;
+    totalScore += normalizedGrowth * 100 * weights.growth;
+    appliedWeights += weights.growth;
+    console.log(
+      'Applied normalized growth rate:',
+      normalizedGrowth * 100,
+      'with weight:',
+      weights.growth
+    );
+  } else {
+    console.warn('No valid growth rate available');
   }
 
-  // Normalize the score based on available weights
-  if (totalWeight > 0) {
-    score = (score / totalWeight) * 100;
+  // If no weights were applied, return 0
+  if (appliedWeights === 0) {
+    console.warn('No weights were applied during health score calculation');
+    return 0;
   }
 
-  return Math.round(score);
+  // Normalize the score based on applied weights
+  const finalScore = totalScore / appliedWeights;
+  console.log('Final health score:', finalScore);
+
+  return Math.round(Math.min(Math.max(finalScore, 0), 100));
 };
 
 // Add metrics type and initialization
@@ -325,8 +343,8 @@ const metrics: CommunityMetrics = {
     positive: 65,
     neutral: 25,
     negative: 10,
-    trend: 'up'
-  }
+    trend: 'up',
+  },
   // ... other metrics
 };
 
@@ -349,17 +367,32 @@ interface ChartEntry {
 export default function CommunityPage() {
   const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>('24h');
   const [selectedPlatform, setSelectedPlatform] = useState<PlatformName | 'all'>('all');
-  const { data, isLoading: loading, error, refetch } = useCommunityData(selectedTimeRange, selectedPlatform);
+  const {
+    data,
+    isLoading: loading,
+    error,
+    refetch,
+  } = useCommunityData(selectedTimeRange, selectedPlatform);
 
   // Calculate health score with proper null checks
   const healthScore = useMemo(() => {
+    if (loading) {
+      console.log('Health score calculation: Loading metrics...');
+      return null;
+    }
+
+    if (error) {
+      console.error('Health score calculation: Error loading metrics:', error);
+      return null;
+    }
+
     if (!data?.metrics) {
       console.log('Health score calculation: No metrics available');
-      return 0;
+      return null;
     }
 
     return calculateHealthScore(data.metrics);
-  }, [data?.metrics]);
+  }, [data?.metrics, loading, error]);
 
   // Handle time range change
   const handleTimeRangeChange = (range: TimeRange) => {
@@ -445,228 +478,333 @@ export default function CommunityPage() {
     );
   }
 
-  const pageHeader = (
-    <div className="flex items-center space-x-4">
-      <div className="flex space-x-2">
-        {timeRanges.map(range => (
-          <button
-            key={range.value}
-            onClick={() => {
-              handleTimeRangeChange(range.value);
-            }}
-            className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
-              selectedTimeRange === range.value
-                ? 'bg-accent text-black'
-                : 'bg-white/5 text-white/70 hover:bg-white/10'
-            }`}
-          >
-            {range.label}
-          </button>
-        ))}
-      </div>
-      <div className="flex space-x-2">
-        {Object.entries(platformLinks).map(([platform, link]) => (
-          <a
-            key={platform}
-            href={link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
-            title={`Open ${platform}`}
-          >
-            {platform === 'telegram' && <PaperAirplaneIcon className="w-5 h-5 text-accent" />}
-            {platform === 'discord' && <DiscordLogoIcon className="w-5 h-5 text-accent" />}
-            {platform === 'twitter' && <TwitterLogoIcon className="w-5 h-5 text-accent" />}
-          </a>
-        ))}
-      </div>
-    </div>
-  );
-
   return (
     <div className="space-y-8">
-      <PageHeader
-        title="Community Analytics"
-        description="Monitor your community growth and engagement across platforms"
-        rightContent={pageHeader}
-      />
+      <div className="flex items-center justify-between mb-6">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold text-gradient">Community Analytics</h1>
+          <p className="text-white/70">
+            Monitor your community growth and engagement across platforms
+          </p>
+        </div>
+        <div className="flex items-center space-x-4">
+          <div className="flex space-x-2">
+            {timeRanges.map(range => (
+              <button
+                key={range.value}
+                onClick={() => handleTimeRangeChange(range.value)}
+                className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                  selectedTimeRange === range.value
+                    ? 'bg-accent text-black'
+                    : 'bg-white/5 text-white/70 hover:bg-white/10'
+                }`}
+              >
+                {range.label}
+              </button>
+            ))}
+          </div>
+          <div className="flex space-x-2">
+            {Object.entries(platformLinks).map(([platform, link]) => {
+              const isConnected = link && link !== '#' && !link.includes('your-');
+              return (
+                <a
+                  key={platform}
+                  href={isConnected ? link : '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`p-2 rounded-lg transition-all duration-300 ${
+                    isConnected
+                      ? 'bg-white/5 hover:bg-white/10 cursor-pointer'
+                      : 'bg-white/5 opacity-50 cursor-not-allowed'
+                  }`}
+                  title={`${platform.charAt(0).toUpperCase() + platform.slice(1)} ${isConnected ? '(Connected)' : '(Not Connected)'}`}
+                >
+                  {platform === 'telegram' && (
+                    <PaperAirplaneIcon
+                      className={`w-5 h-5 ${isConnected ? 'text-accent' : 'text-white/50'}`}
+                    />
+                  )}
+                  {platform === 'discord' && (
+                    <DiscordLogoIcon
+                      className={`w-5 h-5 ${isConnected ? 'text-accent' : 'text-white/50'}`}
+                    />
+                  )}
+                  {platform === 'twitter' && (
+                    <TwitterLogoIcon
+                      className={`w-5 h-5 ${isConnected ? 'text-accent' : 'text-white/50'}`}
+                    />
+                  )}
+                </a>
+              );
+            })}
+          </div>
+        </div>
+      </div>
 
-      <div className="space-y-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <Card className="glass-card">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <div className="w-16 h-16 rounded-lg bg-[#87fafd]/10 flex items-center justify-center">
-                    <HeartIcon className="w-8 h-8 text-accent" />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Health Score Card */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+          <Card className="glass-card h-full">
+            <div className="flex flex-col h-full">
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center space-x-6">
+                  <div className="relative w-32 h-32 rounded-xl bg-[#87fafd]/10 flex items-center justify-center">
+                    <div className="relative w-20 h-20">
+                      <svg viewBox="0 0 24 24" className="w-20 h-20">
+                        <defs>
+                          <clipPath id="heart-clip">
+                            <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
+                          </clipPath>
+                          <linearGradient id="wave-gradient" x1="0" y1="1" x2="0" y2="0">
+                            <stop offset="0%" stopColor="#87fafd" />
+                            <stop
+                              offset={`${healthScore ? Math.max(0, Math.min(100, (healthScore / 90) * 100)) : 0}%`}
+                              stopColor="#87fafd"
+                            />
+                            <stop
+                              offset={`${healthScore ? Math.max(0, Math.min(100, (healthScore / 90) * 100)) : 0}%`}
+                              stopColor="rgba(135, 250, 253, 0.1)"
+                            />
+                            <stop offset="100%" stopColor="rgba(135, 250, 253, 0.1)" />
+                          </linearGradient>
+                          <filter id="wave" x="0" y="0" width="100%" height="100%">
+                            <feTurbulence
+                              type="fractalNoise"
+                              baseFrequency="0.01 0.05"
+                              numOctaves="2"
+                              result="noise"
+                              seed="1"
+                            >
+                              <animate
+                                attributeName="seed"
+                                from="1"
+                                to="2"
+                                dur="1.5s"
+                                repeatCount="indefinite"
+                              />
+                            </feTurbulence>
+                            <feDisplacementMap in="SourceGraphic" in2="noise" scale="2" />
+                          </filter>
+                        </defs>
+                        {/* Background heart (filled with gradient) */}
+                        <g clipPath="url(#heart-clip)">
+                          <rect
+                            x="0"
+                            y="0"
+                            width="24"
+                            height="24"
+                            fill="rgba(135, 250, 253, 0.1)"
+                          />
+                          <rect
+                            x="0"
+                            y="0"
+                            width="24"
+                            height="24"
+                            fill="url(#wave-gradient)"
+                            filter="url(#wave)"
+                            className="transition-all duration-1000"
+                          />
+                        </g>
+                        {/* Heart outline */}
+                        <path
+                          d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z"
+                          fill="none"
+                          stroke="#87fafd"
+                          strokeWidth="1"
+                          strokeOpacity="0.6"
+                          className="transition-all duration-1000"
+                        />
+                      </svg>
+                    </div>
                   </div>
                   <div>
-                    <Text className="text-white/70">Community Health Score</Text>
-                    <Title className="text-white text-3xl">{healthScore.toFixed(1)}</Title>
+                    <Text className="text-white/70 text-lg mb-1">Overall Health Score</Text>
+                    {loading ? (
+                      <div className="animate-pulse bg-white/10 h-12 w-32 rounded mt-1"></div>
+                    ) : error ? (
+                      <Text className="text-red-400 text-4xl">Error</Text>
+                    ) : healthScore === null ? (
+                      <Text className="text-yellow-400 text-4xl">N/A</Text>
+                    ) : (
+                      <div className="flex items-baseline space-x-2">
+                        <Title className="text-white text-5xl font-semibold">
+                          {healthScore.toFixed(1)}
+                        </Title>
+                        <Text className="text-white/50">/ 100</Text>
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
-                  {healthScore >= 80 ? (
-                    <ArrowUpCircleIcon className="w-6 h-6 text-green-400" />
-                  ) : healthScore >= 60 ? (
-                    <ArrowPathIcon className="w-6 h-6 text-yellow-400" />
-                  ) : (
-                    <ArrowDownCircleIcon className="w-6 h-6 text-red-400" />
+                  {!loading && !error && healthScore !== null && (
+                    <>
+                      {healthScore >= 80 ? (
+                        <ArrowUpCircleIcon className="w-8 h-8 text-emerald-400" />
+                      ) : healthScore >= 60 ? (
+                        <ArrowPathIcon className="w-8 h-8 text-yellow-400" />
+                      ) : (
+                        <ArrowDownCircleIcon className="w-8 h-8 text-rose-400" />
+                      )}
+                      <Text
+                        className={`text-base ${
+                          healthScore >= 80
+                            ? 'text-emerald-400'
+                            : healthScore >= 60
+                              ? 'text-yellow-400'
+                              : 'text-rose-400'
+                        }`}
+                      >
+                        {healthScore >= 80
+                          ? 'Healthy'
+                          : healthScore >= 60
+                            ? 'Needs Attention'
+                            : 'Critical'}
+                      </Text>
+                    </>
                   )}
-                  <Text
-                    className={`text-sm ${
-                      healthScore >= 80
-                        ? 'text-green-400'
-                        : healthScore >= 60
-                          ? 'text-yellow-400'
-                          : 'text-red-400'
+                </div>
+              </div>
+
+              {/* Platform-specific health indicators */}
+              <div className="flex-1 flex flex-col justify-center">
+                <div className="grid grid-cols-3 gap-4">
+                  {Object.entries(platformMetrics).map(([platform, metrics]) => (
+                    <div
+                      key={platform}
+                      className="flex flex-col p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-all duration-300"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center space-x-2">
+                          {platform === 'telegram' && (
+                            <PaperAirplaneIcon className="w-5 h-5 text-accent" />
+                          )}
+                          {platform === 'discord' && (
+                            <DiscordLogoIcon className="w-5 h-5 text-accent" />
+                          )}
+                          {platform === 'twitter' && (
+                            <TwitterLogoIcon className="w-5 h-5 text-accent" />
+                          )}
+                          <div className="text-base text-white/90 capitalize">{platform}</div>
+                        </div>
+                        <div
+                          className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                            metrics.sentiment.score >= 80
+                              ? 'bg-emerald-400'
+                              : metrics.sentiment.score >= 60
+                                ? 'bg-yellow-400'
+                                : 'bg-rose-400'
+                          }`}
+                        />
+                      </div>
+                      <div className="text-2xl font-semibold text-white mt-1">
+                        {metrics.sentiment.score}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </Card>
+        </motion.div>
+
+        {/* Trending Topics Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+          <TrendingTopicsChart topics={getSelectedPlatformMetrics().trendingTopics} />
+        </motion.div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {[
+          {
+            title: 'Total Members',
+            value: Intl.NumberFormat('en', { notation: 'compact' }).format(totalMembers),
+            icon: UserGroupIcon,
+            change: '+12%',
+            positive: true,
+            hasAnomaly: growthAnomalies[growthAnomalies.length - 1],
+          },
+          {
+            title: 'Active Members',
+            value: Intl.NumberFormat('en', { notation: 'compact' }).format(totalActive),
+            icon: HeartIcon,
+            change: '+8%',
+            positive: true,
+          },
+          {
+            title: 'Messages (24h)',
+            value: Intl.NumberFormat('en', { notation: 'compact' }).format(totalMessages),
+            icon: ChatBubbleLeftRightIcon,
+            change: '+15%',
+            positive: true,
+          },
+          {
+            title: 'Avg. Engagement',
+            value: `${averageEngagement}%`,
+            icon: ChartBarIcon,
+            change: '+5%',
+            positive: true,
+          },
+        ].map((stat, index) => (
+          <motion.div
+            key={stat.title}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+          >
+            <Card className="glass-card hover-accent">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <div className="w-12 h-12 rounded-lg bg-[#87fafd]/10 flex items-center justify-center mr-4">
+                    <stat.icon className="w-6 h-6 text-accent" />
+                  </div>
+                  <div>
+                    <Text className="text-white/70">{stat.title}</Text>
+                    <Title className="text-white text-2xl">{stat.value}</Title>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  {stat.hasAnomaly && (
+                    <ExclamationCircleIcon
+                      className="w-5 h-5 text-yellow-400"
+                      title="Unusual activity detected"
+                    />
+                  )}
+                  <div
+                    className={`px-2 py-1 rounded-full text-xs ${
+                      stat.positive
+                        ? 'bg-green-400/10 text-green-400'
+                        : 'bg-red-400/10 text-red-400'
                     }`}
                   >
-                    {healthScore >= 80 ? 'Healthy' : healthScore >= 60 ? 'Needs Attention' : 'Critical'}
-                  </Text>
+                    {stat.change}
+                  </div>
                 </div>
               </div>
             </Card>
           </motion.div>
+        ))}
+      </div>
 
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-            <TrendingTopicsChart topics={getSelectedPlatformMetrics().trendingTopics} />
-          </motion.div>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <MemberGrowthChart data={memberGrowthData} selectedRange={selectedTimeRange} />
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          {[
-            {
-              title: 'Total Members',
-              value: Intl.NumberFormat('en', { notation: 'compact' }).format(totalMembers),
-              icon: UserGroupIcon,
-              change: '+12%',
-              positive: true,
-              hasAnomaly: growthAnomalies[growthAnomalies.length - 1],
-            },
-            {
-              title: 'Active Members',
-              value: Intl.NumberFormat('en', { notation: 'compact' }).format(totalActive),
-              icon: HeartIcon,
-              change: '+8%',
-              positive: true,
-            },
-            {
-              title: 'Messages (24h)',
-              value: Intl.NumberFormat('en', { notation: 'compact' }).format(totalMessages),
-              icon: ChatBubbleLeftRightIcon,
-              change: '+15%',
-              positive: true,
-            },
-            {
-              title: 'Avg. Engagement',
-              value: `${averageEngagement}%`,
-              icon: ChartBarIcon,
-              change: '+5%',
-              positive: true,
-            },
-          ].map((stat, index) => (
-            <motion.div
-              key={stat.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <Card className="glass-card hover-accent">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="w-12 h-12 rounded-lg bg-[#87fafd]/10 flex items-center justify-center mr-4">
-                      <stat.icon className="w-6 h-6 text-accent" />
-                    </div>
-                    <div>
-                      <Text className="text-white/70">{stat.title}</Text>
-                      <Title className="text-white text-2xl">{stat.value}</Title>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    {stat.hasAnomaly && (
-                      <ExclamationCircleIcon
-                        className="w-5 h-5 text-yellow-400"
-                        title="Unusual activity detected"
-                      />
-                    )}
-                    <div
-                      className={`px-2 py-1 rounded-full text-xs ${
-                        stat.positive
-                          ? 'bg-green-400/10 text-green-400'
-                          : 'bg-red-400/10 text-red-400'
-                      }`}
-                    >
-                      {stat.change}
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
+        <HourlyActivityChart data={hourlyActivity} selectedDate={new Date().toLocaleDateString()} />
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <MemberGrowthChart
-            data={memberGrowthData}
-            selectedRange={selectedTimeRange}
-          />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <SentimentChart data={sentimentData} selectedRange={selectedTimeRange} />
 
-          <HourlyActivityChart
-            data={hourlyActivity}
-            selectedDate={new Date().toLocaleDateString()}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="glass-card min-h-[500px]">
-            <Title className="text-white mb-4">Community Sentiment Trends</Title>
-            <div className="h-[400px] w-full">
-              <AreaChart
-                data={sentimentData}
-                index="date"
-                categories={['positive', 'neutral', 'negative']}
-                colors={['emerald', 'yellow', 'rose']}
-                stack={true}
-                valueFormatter={(value) => `${value}%`}
-                showLegend={true}
-                showAnimation={true}
-                className={chartStyles.areaChart.className}
-                customTooltip={({ active, payload, label }) => {
-                  if (!active || !payload) return null;
-                  return (
-                    <div className="bg-black/90 border border-accent/20 rounded-lg p-3 shadow-lg backdrop-blur-sm antialiased">
-                      <div className="text-white/80 text-sm font-medium mb-2">{label}</div>
-                      {payload.map((entry: ChartEntry, index: number) => (
-                        <div key={index} className="flex items-center justify-between space-x-4 mb-1 last:mb-0">
-                          <span className="text-white/70 text-sm capitalize">{entry.name}:</span>
-                          <span className="text-accent font-medium">{entry.value}%</span>
-                        </div>
-                      ))}
-                    </div>
-                  );
-                }}
-              />
-            </div>
-          </Card>
-
-          <Card className="glass-card min-h-[500px]">
-            <Title className="text-white mb-4">Current Sentiment Distribution</Title>
-            <div className="h-[400px] w-full">
-              <DonutChart
-                data={[
-                  { name: 'Positive', value: metrics.sentiment.positive },
-                  { name: 'Neutral', value: metrics.sentiment.neutral },
-                  { name: 'Negative', value: metrics.sentiment.negative }
-                ]}
-                category="value"
-                index="name"
-                colors={['emerald', 'yellow', 'rose']}
-                valueFormatter={(value) => `${value}%`}
-              />
-            </div>
-          </Card>
-        </div>
+        <CurrentSentimentChart
+          data={{
+            positive: metrics?.sentiment?.positive || 0,
+            neutral: metrics?.sentiment?.neutral || 0,
+            negative: metrics?.sentiment?.negative || 0,
+          }}
+        />
       </div>
     </div>
   );
