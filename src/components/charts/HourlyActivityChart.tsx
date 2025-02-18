@@ -5,8 +5,8 @@ import { useState, useMemo } from 'react';
 import BaseChart, { InsightType, HighlightedData } from './BaseChart';
 import CustomTooltip from '@/components/common/CustomTooltip';
 import { formatValue } from '@/utils/formatters';
-import { chartStyles } from '@/styles/chartStyles';
 import type { EventProps } from '@tremor/react';
+import styles from './HourlyActivityChart.module.css';
 
 interface HourlyActivityData {
   hour: string;
@@ -23,6 +23,22 @@ interface HourlyActivityChartProps {
   chartId?: string;
 }
 
+// Define colors using Tremor's color system with our custom theme colors
+const chartColors = {
+  messages: { color: 'cyan', value: 'var(--chart-messages)' },
+  reactions: { color: 'emerald', value: 'var(--chart-reactions)' },
+  threads: { color: 'violet', value: 'var(--chart-threads)' },
+} as const;
+
+type ChartCategory = keyof typeof chartColors;
+const chartCategories: ChartCategory[] = ['messages', 'reactions', 'threads'];
+
+const categoryLabels: Record<ChartCategory, string> = {
+  messages: 'Messages',
+  reactions: 'Reactions',
+  threads: 'Threads',
+};
+
 export default function HourlyActivityChart({
   data,
   selectedDate,
@@ -34,15 +50,7 @@ export default function HourlyActivityChart({
   const [hiddenSeries, setHiddenSeries] = useState<string[]>([]);
   const [highlightedHour, setHighlightedHour] = useState<string | null>(null);
 
-  const categories = ['messages', 'reactions', 'threads'];
-  const colors = ['cyan', 'emerald', 'violet'];
-
-  // Format categories for better readability
-  const categoryLabels = {
-    messages: 'Messages',
-    reactions: 'Reactions',
-    threads: 'Threads',
-  };
+  const colors = chartCategories.map(cat => chartColors[cat].color);
 
   // Calculate peak hours and activity metrics with enhanced insights
   const metrics = useMemo(() => {
@@ -182,7 +190,7 @@ export default function HourlyActivityChart({
     setHiddenSeries(prev => (prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]));
   };
 
-  const visibleCategories = categories.filter(cat => !hiddenSeries.includes(cat));
+  const visibleCategories = chartCategories.filter(cat => !hiddenSeries.includes(cat));
 
   // Calculate percentages for each category
   const percentages = useMemo(() => {
@@ -262,7 +270,7 @@ export default function HourlyActivityChart({
             <span className="text-sm">{selectedDate}</span>
           </div>
           <div
-            className="px-2 py-1 rounded-lg bg-cyan-500/10 text-cyan-400 text-sm"
+            className={`px-2 py-1 rounded-lg bg-cyan-500/10 text-cyan-400 text-sm`}
             role="status"
             aria-label={`Average hourly activity: ${formatValue(metrics.avgActivity, 'activity')}`}
           >
@@ -287,6 +295,11 @@ export default function HourlyActivityChart({
                   ? 'ring-2 ring-accent/50'
                   : ''
               }`}
+              style={
+                {
+                  '--highlight-color': chartColors[key as ChartCategory].value,
+                } as React.CSSProperties
+              }
             >
               <div className="text-sm text-white/70">
                 {categoryLabels[key as keyof typeof categoryLabels]}
@@ -300,31 +313,45 @@ export default function HourlyActivityChart({
         </div>
 
         {/* Main chart */}
-        <BarChart
-          data={transformedData}
-          index="hour"
-          categories={visibleCategories}
-          colors={colors}
-          showLegend={true}
-          showGridLines={true}
-          startEndOnly={false}
-          showAnimation={hiddenSeries.length === 0}
-          className={`${chartStyles.barChart.className} ${highlightTransitionStyles} ${
-            highlightedHour || highlightedData?.key === 'hour'
-              ? '[&_.tremor-BarChart-bar]:transition-all [&_.tremor-BarChart-bar]:duration-300 [&_.tremor-BarChart-bar]:ease-in-out'
-              : ''
-          }`}
-          valueFormatter={value => formatValue(value, 'activity')}
-          onValueChange={handleValueChange}
-          customTooltip={CustomTooltip}
-          yAxisWidth={56}
-          enableLegendSlider={false}
-          noDataText="No data available"
-          showYAxis={true}
-          showXAxis={true}
-          minValue={0}
-          aria-label="Interactive bar chart showing hourly activity distribution"
-        />
+        <div className={styles.chartContainer}>
+          <BarChart
+            data={transformedData}
+            index="hour"
+            categories={visibleCategories}
+            colors={colors}
+            showLegend={true}
+            showGridLines={true}
+            startEndOnly={false}
+            showAnimation={hiddenSeries.length === 0}
+            className={`${highlightTransitionStyles} ${
+              highlightedHour || highlightedData?.key === 'hour'
+                ? '[&_.tremor-BarChart-bar]:transition-all [&_.tremor-BarChart-bar]:duration-300 [&_.tremor-BarChart-bar]:ease-in-out'
+                : ''
+            }`}
+            valueFormatter={value => formatValue(value, 'activity')}
+            onValueChange={handleValueChange}
+            customTooltip={CustomTooltip}
+            yAxisWidth={56}
+            enableLegendSlider={false}
+            noDataText="No data available"
+            showYAxis={true}
+            showXAxis={true}
+            minValue={0}
+            aria-label="Interactive bar chart showing hourly activity distribution"
+          />
+
+          {/* Peak hour indicator */}
+          {metrics.peakHour && (
+            <div
+              className={styles.peakHourIndicator}
+              style={{
+                left: `${(Number(metrics.peakHour.hour) / 24) * 100}%`,
+                width: '4.16%', // 1/24th of the width
+              }}
+              aria-label={`Peak activity hour at ${metrics.peakHour.hour}:00`}
+            />
+          )}
+        </div>
       </div>
     </BaseChart>
   );

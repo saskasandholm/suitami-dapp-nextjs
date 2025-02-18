@@ -13,24 +13,27 @@ import {
   generateSentimentInsights,
   SentimentMetrics,
 } from '@/types/sentiment';
+import styles from './CurrentSentimentChart.module.css';
 
 interface CurrentSentimentChartProps extends BaseSentimentChartProps {
   data: CurrentSentimentData;
 }
 
-// Define CSS custom properties
-const cssVariables = {
-  '--positive-fill': `var(--${getColorClassName('emerald', 'fill')})`,
-  '--positive-text': `var(--${getColorClassName('emerald', 'text')})`,
-  '--neutral-fill': `var(--${getColorClassName('slate', 'fill')})`,
-  '--neutral-text': `var(--${getColorClassName('slate', 'text')})`,
-  '--negative-fill': `var(--${getColorClassName('rose', 'fill')})`,
-  '--negative-text': `var(--${getColorClassName('rose', 'text')})`,
-} as Record<`--${string}`, string>;
+// Define chart categories and colors using our three-layer system
+const chartColors = {
+  positive: { color: 'emerald', value: 'var(--chart-positive)' },
+  neutral: { color: 'slate', value: 'var(--chart-neutral)' },
+  negative: { color: 'rose', value: 'var(--chart-negative)' },
+} as const;
 
-// Define chart categories and colors
-const chartCategories = ['positive', 'neutral', 'negative'] as const;
-const chartColors = [...SENTIMENT_COLORS] as string[];
+type ChartCategory = keyof typeof chartColors;
+const chartCategories: ChartCategory[] = ['positive', 'neutral', 'negative'];
+
+const categoryLabels: Record<ChartCategory, string> = {
+  positive: 'Positive',
+  neutral: 'Neutral',
+  negative: 'Negative',
+};
 
 export default function CurrentSentimentChart({
   data,
@@ -61,7 +64,6 @@ export default function CurrentSentimentChart({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: 0.2 }}
       className="h-full w-full flex flex-col"
-      style={cssVariables}
     >
       <BaseChart
         title={title}
@@ -85,9 +87,9 @@ export default function CurrentSentimentChart({
         highlightedData={highlightedData}
         className="h-full flex flex-col"
       >
-        <div className="relative min-h-[300px] w-full flex items-center justify-center">
+        <div className={styles.chartContainer}>
           <DonutChart
-            className={`${chartStyles.donutChart.className} h-[240px] w-[240px]`}
+            className={styles.donutChart}
             data={[
               { name: 'positive', value: data.positive },
               { name: 'neutral', value: data.neutral },
@@ -95,11 +97,28 @@ export default function CurrentSentimentChart({
             ]}
             category="value"
             index="name"
-            colors={chartColors}
+            colors={chartCategories.map(cat => chartColors[cat].color)}
             valueFormatter={value => formatValue(value, 'percent')}
             showAnimation={true}
             showLabel={false}
           />
+          <div className={styles.centerText}>
+            <span className={styles.centerValue}>{positivePercentage}%</span>
+            <span className={styles.centerLabel}>Positive Sentiment</span>
+          </div>
+          <div className={styles.legend}>
+            {chartCategories.map(category => (
+              <div
+                key={category}
+                className={styles.legendItem}
+                onClick={() => onHighlightChange?.({ key: 'category', value: category })}
+              >
+                <div className={`${styles.legendDot} ${styles[category]}`} />
+                <span>{categoryLabels[category]}</span>
+                <span>{formatValue(data[category], 'percent')}%</span>
+              </div>
+            ))}
+          </div>
         </div>
       </BaseChart>
     </motion.div>

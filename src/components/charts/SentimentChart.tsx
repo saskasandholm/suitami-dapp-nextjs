@@ -8,8 +8,6 @@ import {
 } from '@heroicons/react/24/outline';
 import { useState, useMemo, useEffect } from 'react';
 import BaseChart from './BaseChart';
-import { chartStyles } from '@/styles/chartStyles';
-import CustomTooltip from '@/components/common/CustomTooltip';
 import { formatValue, formatDate } from '@/utils/formatters';
 import { getColorClassName } from '@/utils/chartUtils';
 import {
@@ -21,6 +19,7 @@ import {
   generateSentimentInsights,
   SentimentTrend,
 } from '@/types/sentiment';
+import styles from './SentimentChart.module.css';
 
 interface SentimentChartProps extends BaseSentimentChartProps {
   data: SentimentData[];
@@ -40,9 +39,44 @@ const cssVariables = {
   '--negative-text': `var(--${getColorClassName('rose', 'text')})`,
 } as Record<`--${string}`, string>;
 
-// Define chart categories and colors
-const chartCategories = ['positive', 'neutral', 'negative'] as const;
-const chartColors = [...SENTIMENT_COLORS] as string[];
+// Define colors using Tremor's color system with our custom theme colors
+const chartColors = {
+  positive: { color: 'emerald', value: '#10b981' }, // Success color
+  neutral: { color: 'slate', value: '#64748b' }, // Neutral color
+  negative: { color: 'rose', value: '#ef4444' }, // Error color
+} as const;
+
+type ChartCategory = keyof typeof chartColors;
+const chartCategories: ChartCategory[] = ['positive', 'neutral', 'negative'];
+
+const categoryLabels: Record<ChartCategory, string> = {
+  positive: 'Positive',
+  neutral: 'Neutral',
+  negative: 'Negative',
+};
+
+// Rename to SentimentTooltip to avoid naming conflict
+const SentimentTooltip = ({ active, payload }: any) => {
+  if (!active || !payload) return null;
+
+  return (
+    <div className={styles.tooltip}>
+      <p className={styles.tooltipDate}>{formatDate(payload[0]?.payload?.date)}</p>
+      {payload.map((entry: { name: ChartCategory; value: number }) => (
+        <div key={entry.name} className={styles.tooltipRow}>
+          <div className={styles.tooltipLabel}>
+            <div
+              className={styles.tooltipDot}
+              style={{ backgroundColor: chartColors[entry.name].value }}
+            />
+            <span>{categoryLabels[entry.name]}</span>
+          </div>
+          <span className={styles.tooltipValue}>{formatValue(entry.value, 'percentage')}</span>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 export default function SentimentChart({
   data,
@@ -197,29 +231,36 @@ export default function SentimentChart({
         highlightedData={highlightedData}
         className="h-full flex flex-col"
       >
-        <div className="relative min-h-[300px] w-full">
+        <div className={styles.chartContainer}>
+          {/* Define gradients */}
+          <svg style={{ height: 0 }}>
+            <defs>
+              <linearGradient id="positive-gradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#10b981" stopOpacity="0.3" />
+                <stop offset="100%" stopColor="#10b981" stopOpacity="0.1" />
+              </linearGradient>
+              <linearGradient id="neutral-gradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#64748b" stopOpacity="0.3" />
+                <stop offset="100%" stopColor="#64748b" stopOpacity="0.1" />
+              </linearGradient>
+              <linearGradient id="negative-gradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#ef4444" stopOpacity="0.3" />
+                <stop offset="100%" stopColor="#ef4444" stopOpacity="0.1" />
+              </linearGradient>
+            </defs>
+          </svg>
+
           <AreaChart
-            className={`${chartStyles.areaChart.className} h-[300px] transition-opacity duration-200`}
+            className="h-[300px] transition-opacity duration-200"
             data={formattedData}
             index="id"
             categories={Array.from(chartCategories)}
-            colors={chartColors}
+            colors={chartCategories.map(cat => chartColors[cat].color)}
             valueFormatter={value => formatValue(value)}
             showAnimation={true}
             stack={true}
             curveType="monotone"
-            customTooltip={(props: any) => {
-              const dataPoint = formattedData.find(d => d.id === props.activePoint?.x);
-              if (!dataPoint) return null;
-              return CustomTooltip({
-                ...props,
-                activePoint: {
-                  ...props.activePoint,
-                  x: dataPoint.displayDate,
-                  id: dataPoint.id,
-                },
-              });
-            }}
+            customTooltip={SentimentTooltip}
             showGridLines={false}
             minValue={0}
             maxValue={100}

@@ -2,97 +2,92 @@ import { Card, Title, Text } from '@tremor/react';
 import { HashtagIcon, ArrowTrendingUpIcon } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
 import { formatValue } from '@/utils/formatters';
+import styles from './TrendingTopicsChart.module.css';
 
 interface TrendingTopic {
   topic: string;
   mentions: number;
   sentiment: number;
   trend: 'up' | 'down' | 'stable';
+  relatedTopics?: string[];
 }
 
 interface TrendingTopicsChartProps {
   topics: TrendingTopic[];
 }
 
+// Define sentiment and trend color mappings
+const sentimentColors = {
+  high: { bg: 'bg-emerald-400/10', text: 'text-emerald-400' },
+  medium: { bg: 'bg-yellow-400/10', text: 'text-yellow-400' },
+  low: { bg: 'bg-rose-400/10', text: 'text-rose-400' },
+} as const;
+
+const trendColors = {
+  up: 'text-emerald-400',
+  down: 'text-rose-400',
+  stable: 'text-yellow-400',
+} as const;
+
 export default function TrendingTopicsChart({ topics }: TrendingTopicsChartProps) {
+  const getSentimentColor = (sentiment: number) => {
+    if (sentiment >= 80) return sentimentColors.high;
+    if (sentiment >= 60) return sentimentColors.medium;
+    return sentimentColors.low;
+  };
+
   return (
     <Card className="glass-card h-full">
       <Title className="text-white mb-4">Trending Topics</Title>
-      <div className="space-y-3 max-h-[400px] overflow-y-auto custom-scrollbar" role="list">
-        {topics.map((topic, index) => (
-          <motion.div
-            key={topic.topic}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className="group"
-            role="listitem"
-          >
-            <div className="flex items-center justify-between p-3 bg-white/5 hover:bg-white/10 rounded-lg transition-all duration-200 ease-in-out transform hover:scale-[1.02]">
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center group-hover:bg-accent/20 transition-colors">
-                  <HashtagIcon className="w-4 h-4 text-accent" />
+      <div className={styles.topicsList} role="list">
+        {topics.map((topic, index) => {
+          const sentimentColor = getSentimentColor(topic.sentiment);
+          return (
+            <motion.div
+              key={topic.topic}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className={styles.topicItem}
+              role="listitem"
+            >
+              <div className={styles.topicContent}>
+                <div className={styles.topicHeader}>
+                  <div className={styles.iconContainer}>
+                    <HashtagIcon className="w-4 h-4 text-accent" />
+                  </div>
+                  <div>
+                    <Text className={styles.topicTitle}>{topic.topic}</Text>
+                    <Text className={styles.topicMentions}>
+                      {formatValue(topic.mentions, 'mentions')} mentions
+                    </Text>
+                  </div>
                 </div>
-                <div>
-                  <Text className="text-white font-medium group-hover:text-accent transition-colors">
-                    {topic.topic}
-                  </Text>
-                  <Text className="text-white/50">
-                    {formatValue(topic.mentions, 'mentions')} mentions
-                  </Text>
+                <div className={styles.topicMetrics}>
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    className={`${styles.sentimentBadge} ${sentimentColor.bg} ${sentimentColor.text}`}
+                  >
+                    {topic.sentiment}% positive
+                  </motion.div>
+                  <motion.div whileHover={{ scale: 1.1 }} className={styles.trendContainer}>
+                    <ArrowTrendingUpIcon className={`w-4 h-4 ${trendColors[topic.trend]}`} />
+                  </motion.div>
                 </div>
               </div>
-              <div className="flex items-center space-x-3">
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  className={`px-2 py-1 rounded-full text-xs ${
-                    topic.sentiment >= 80
-                      ? 'bg-green-400/10 text-green-400'
-                      : topic.sentiment >= 60
-                        ? 'bg-yellow-400/10 text-yellow-400'
-                        : 'bg-red-400/10 text-red-400'
-                  }`}
-                >
-                  {topic.sentiment}% positive
-                </motion.div>
-                <motion.div
-                  whileHover={{ scale: 1.1 }}
-                  className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center"
-                >
-                  <ArrowTrendingUpIcon
-                    className={`w-4 h-4 ${
-                      topic.trend === 'up'
-                        ? 'text-green-400'
-                        : topic.trend === 'down'
-                          ? 'text-red-400'
-                          : 'text-yellow-400'
-                    }`}
-                  />
-                </motion.div>
-              </div>
-            </div>
-          </motion.div>
-        ))}
+              {topic.relatedTopics && topic.relatedTopics.length > 0 && (
+                <div className={styles.relatedTopics}>
+                  {topic.relatedTopics.map(relatedTopic => (
+                    <span key={relatedTopic} className={styles.relatedTopic}>
+                      {relatedTopic}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </motion.div>
+          );
+        })}
       </div>
-      <style jsx global>{`
-        .custom-scrollbar {
-          scrollbar-width: thin;
-          scrollbar-color: rgba(135, 250, 253, 0.3) transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background-color: rgba(135, 250, 253, 0.3);
-          border-radius: 3px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background-color: rgba(135, 250, 253, 0.5);
-        }
-      `}</style>
     </Card>
   );
-} 
+}

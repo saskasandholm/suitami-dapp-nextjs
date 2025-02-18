@@ -1,0 +1,114 @@
+.chartContainer {
+  position: relative;
+  min-height: 300px;
+  width: 100%;
+}
+
+/* Area fills using gradients */
+.chartContainer :global(.recharts-area[name='positive']) {
+  fill: url(#positive-gradient);
+}
+
+.chartContainer :global(.recharts-area[name='neutral']) {
+  fill: url(#neutral-gradient);
+}
+
+.chartContainer :global(.recharts-area[name='negative']) {
+  fill: url(#negative-gradient);
+}
+
+/* Line colors */
+.chartContainer :global(.recharts-curve[name='positive']) {
+  stroke: #10b981;
+  stroke-width: 2;
+}
+
+.chartContainer :global(.recharts-curve[name='neutral']) {
+  stroke: #64748b;
+  stroke-width: 2;
+}
+
+.chartContainer :global(.recharts-curve[name='negative']) {
+  stroke: #ef4444;
+  stroke-width: 2;
+}
+
+/* Area fill opacity */
+.chartContainer :global(.recharts-area-area) {
+  fill-opacity: 0.2;
+}
+
+/* Hover and interaction states */
+.chartContainer :global(.recharts-area:hover) {
+  fill-opacity: 0.3;
+}
+
+/* Tooltip styles */
+.tooltip {
+  background: rgba(17, 25, 40, 0.95);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.tooltipDate {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.tooltipRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.tooltipLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tooltipDot {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 9999px;
+}
+
+.tooltipValue {
+  color: white;
+  font-weight: 500;
+}
+
+/* Trend indicator styles */
+.trendIndicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.trendPositive {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.trendNegative {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.trendNeutral {
+  background-color: rgba(100, 116, 139, 0.1);
+  color: #64748b;
+}

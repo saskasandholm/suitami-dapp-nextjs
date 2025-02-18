@@ -3,8 +3,6 @@ import { motion } from 'framer-motion';
 import { CalendarIcon, ArrowTrendingUpIcon } from '@heroicons/react/24/outline';
 import { useState, useMemo } from 'react';
 import BaseChart, { InsightType } from './BaseChart';
-import { chartStyles } from '@/styles/chartStyles';
-import CustomTooltip from '@/components/common/CustomTooltip';
 import { formatValue } from '@/utils/formatters';
 import type { EventProps } from '@tremor/react';
 
@@ -13,6 +11,7 @@ interface MemberData {
   total: number;
   active: number;
   new: number;
+  [key: string]: string | number;
 }
 
 interface MemberGrowthChartProps {
@@ -23,26 +22,38 @@ interface MemberGrowthChartProps {
   chartId?: string;
 }
 
-interface EnrichedMemberData extends MemberData {
-  enrichedValues: {
-    [key: string]: {
-      percentChange: number;
-      benchmark: {
-        type: 'average';
-        value: number;
-      };
-      context: string;
-    };
-  };
-}
+// Define categories and their labels
+const categories = ['total', 'active', 'new'] as const;
+type Category = (typeof categories)[number];
 
-// Add a helper function to calculate percentage change
+// Define chart colors using Tremor's color system
+const chartColors = {
+  total: {
+    color: 'cyan',
+    stroke: '#06b6d4',
+    fill: 'rgba(6, 182, 212, 0.2)',
+    label: 'Total Members',
+  },
+  active: {
+    color: 'emerald',
+    stroke: '#10b981',
+    fill: 'rgba(16, 185, 129, 0.2)',
+    label: 'Active Members',
+  },
+  new: {
+    color: 'violet',
+    stroke: '#8b5cf6',
+    fill: 'rgba(139, 92, 246, 0.2)',
+    label: 'New Members',
+  },
+} as const;
+
+// Add helper functions
 const calculatePercentChange = (current: number, previous: number): number => {
   if (previous === 0) return 0;
   return ((current - previous) / previous) * 100;
 };
 
-// Add a helper function to calculate active ratio
 const calculateActiveRatio = (active: number, total: number): number => {
   return Number(((active / total) * 100).toFixed(1));
 };
@@ -54,141 +65,73 @@ export default function MemberGrowthChart({
   highlightedData,
   chartId = 'member-growth',
 }: MemberGrowthChartProps) {
-  const [selectedPoint, setSelectedPoint] = useState<string | null>(null);
-  const [hiddenSeries, setHiddenSeries] = useState<string[]>([]);
+  const [hiddenSeries, setHiddenSeries] = useState<Category[]>([]);
   const [highlightedPeriod, setHighlightedPeriod] = useState<'recent' | 'all' | null>(null);
 
-  const categories = ['total', 'active', 'new'];
-  const colors = ['cyan', 'emerald', 'violet'];
+  const visibleCategories = categories.filter(cat => !hiddenSeries.includes(cat));
 
-  // Calculate growth metrics with enhanced insights
+  // Calculate growth metrics
   const metrics = useMemo(() => {
     const latest = data[data.length - 1];
     const earliest = data[0];
     const previousPeriod = data[Math.floor(data.length / 2)];
 
-    const growth = {
+    return {
       total: Number((((latest.total - earliest.total) / earliest.total) * 100).toFixed(1)),
       active: Number((((latest.active - earliest.active) / earliest.active) * 100).toFixed(1)),
       new: latest.new,
       recentTrend:
         ((latest.total - previousPeriod.total) / (previousPeriod.total - earliest.total) - 1) * 100,
-    };
-
-    return growth;
+    } as const;
   }, [data]);
 
-  // Generate enhanced insights based on the data
+  // Generate insights
   const insights = useMemo(() => {
     const insights: InsightType[] = [];
 
-    // Growth trend insight (High priority with action)
     if (metrics.recentTrend > 10) {
       insights.push({
         text: `Growth is accelerating, with ${metrics.recentTrend.toFixed(1)}% faster growth in recent period`,
-        priority: 'high' as const,
+        priority: 'high',
         action: 'Consider scaling community resources',
-        isExpandable: true,
-        relatedData: {
-          trend: metrics.recentTrend,
-          currentGrowth: metrics.total,
-          details: 'Click to see detailed growth breakdown',
-        },
-        highlightData: {
-          key: 'period',
-          value: 'recent',
-        },
-        relatedCharts: [
-          {
-            chartId: 'hourly-activity',
-            insight: 'Check activity patterns during high-growth periods',
-            chartType: 'bar',
-            color: 'text-cyan-400',
-          },
-        ],
+        highlightData: { key: 'period', value: 'recent' },
       });
     } else if (metrics.recentTrend < -10) {
       insights.push({
         text: `Growth is slowing, with ${Math.abs(metrics.recentTrend).toFixed(1)}% slower growth in recent period`,
-        priority: 'high' as const,
+        priority: 'high',
         action: 'Review engagement strategies',
-        isExpandable: true,
-        relatedData: {
-          trend: metrics.recentTrend,
-          currentGrowth: metrics.total,
-          details: 'Click to see potential factors',
-        },
-        highlightData: {
-          key: 'period',
-          value: 'recent',
-        },
-        relatedCharts: [
-          {
-            chartId: 'sentiment',
-            insight: 'Check if sentiment trends correlate with slowing growth',
-            chartType: 'sentiment',
-            color: 'text-yellow-400',
-          },
-        ],
+        highlightData: { key: 'period', value: 'recent' },
       });
     }
 
-    // Active members insight (Medium priority)
     const lastDataPoint = data[data.length - 1];
     const activeRatio = calculateActiveRatio(lastDataPoint.active, lastDataPoint.total);
     insights.push({
       text: `${activeRatio}% of total members are currently active`,
-      priority: 'medium' as const,
+      priority: 'medium',
       action: activeRatio < 50 ? 'Consider engagement campaign' : undefined,
-      isExpandable: true,
-      relatedData: {
-        activeRatio,
-        totalMembers: lastDataPoint.total,
-        activeMembers: lastDataPoint.active,
-        details: 'Click to see activity trends',
-        trend: activeRatio,
-      },
-      highlightData: {
-        key: 'category',
-        value: 'active',
-      },
-      relatedCharts: [
-        {
-          chartId: 'hourly-activity',
-          insight: 'View hourly patterns of active members',
-          chartType: 'bar',
-          color: 'text-cyan-400',
-        },
-      ],
+      highlightData: { key: 'category', value: 'active' },
     });
 
-    // New members insight (Medium/Low priority based on volume)
     if (metrics.new > 0) {
       insights.push({
         text: `${formatValue(metrics.new, 'members')} new members joined in this period`,
-        priority: metrics.new > 100 ? ('medium' as const) : ('low' as const),
-        isExpandable: true,
-        relatedData: {
-          newMembers: metrics.new,
-          joinDates: 'Click to see join date distribution',
-        },
-        highlightData: {
-          key: 'category',
-          value: 'new',
-        },
+        priority: metrics.new > 100 ? 'medium' : 'low',
+        highlightData: { key: 'category', value: 'new' },
       });
     }
 
     return insights;
   }, [data, metrics]);
 
-  // Handle insight click for drill-down and highlighting
+  // Handle insight click
   const handleInsightClick = (insight: InsightType | null) => {
     if (insight?.highlightData) {
-      const value = insight.highlightData.value;
       setHighlightedPeriod(
-        insight.highlightData.key === 'period' && (value === 'recent' || value === 'all')
-          ? value
+        insight.highlightData.key === 'period' &&
+          (insight.highlightData.value === 'recent' || insight.highlightData.value === 'all')
+          ? insight.highlightData.value
           : null
       );
       onHighlightChange?.(insight.highlightData);
@@ -198,212 +141,103 @@ export default function MemberGrowthChart({
     }
   };
 
-  const handleLegendClick = (item: string) => {
-    setHiddenSeries(prev => (prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]));
+  // Handle legend click
+  const handleLegendClick = (category: Category) => {
+    setHiddenSeries(prev =>
+      prev.includes(category) ? prev.filter(i => i !== category) : [...prev, category]
+    );
   };
 
-  const visibleCategories = categories.filter(cat => !hiddenSeries.includes(cat));
-
-  // Format categories for better readability
-  const categoryLabels = {
-    total: 'Total Members',
-    active: 'Active Members',
-    new: 'New Members',
-  };
-
-  // Use a stable timestamp for lastUpdated
-  const lastUpdated = useMemo(() => new Date(data[data.length - 1].date), [data]);
-
-  // Update chart styles based on highlighted data
-  const getAreaStyles = (category: string) => {
-    if (highlightedData?.key === 'category' && highlightedData.value === category) {
-      return 'opacity-100 !stroke-[3px] !stroke-accent/80 !fill-accent/20 scale-[1.02] transform-gpu';
-    }
-    if (highlightedData?.key === 'category' && highlightedData.value !== category) {
-      return 'opacity-20 saturate-[0.5]';
-    }
-    return '';
-  };
-
-  // Calculate the date range for highlighting periods
-  const getHighlightedRange = () => {
-    if (highlightedPeriod === 'recent') {
-      const midPoint = Math.floor(data.length / 2);
-      return {
-        start: data[midPoint].date,
-        end: data[data.length - 1].date,
-      };
-    }
-    return null;
-  };
-
-  // Add highlight transition styles
-  const highlightTransitionStyles = 'transition-all duration-300 ease-in-out';
-
-  // Calculate enriched data for tooltips
-  const enrichedData = useMemo(() => {
-    return data.map((point, index) => {
-      const previousPoint = index > 0 ? data[index - 1] : null;
-      const avgTotal = data.reduce((sum, d) => sum + d.total, 0) / data.length;
-      const avgActive = data.reduce((sum, d) => sum + d.active, 0) / data.length;
-      const avgNew = data.reduce((sum, d) => sum + d.new, 0) / data.length;
-
-      return {
-        ...point,
-        enrichedValues: {
-          total: {
-            percentChange: previousPoint
-              ? calculatePercentChange(point.total, previousPoint.total)
-              : 0,
-            benchmark: { type: 'average' as const, value: avgTotal },
-            context: `${point.total > avgTotal ? 'Above' : 'Below'} average by ${Math.abs(((point.total - avgTotal) / avgTotal) * 100).toFixed(1)}%`,
-          },
-          active: {
-            percentChange: previousPoint
-              ? calculatePercentChange(point.active, previousPoint.active)
-              : 0,
-            benchmark: { type: 'average' as const, value: avgActive },
-            context: `${((point.active / point.total) * 100).toFixed(1)}% of total members are active`,
-          },
-          new: {
-            percentChange: previousPoint ? calculatePercentChange(point.new, previousPoint.new) : 0,
-            benchmark: { type: 'average' as const, value: avgNew },
-            context: point.new > avgNew ? 'Above average new members' : 'Below average new members',
-          },
-        },
-      };
-    });
-  }, [data]) as EnrichedMemberData[];
-
-  // Custom formatter for chart values that also attaches enriched data
-  const formatChartValue = (value: number, category?: string) => {
-    if (!category) return formatValue(value, 'members');
-    const point = enrichedData.find(d => d[category as keyof MemberData] === value);
-    if (!point) return formatValue(value, 'members');
-
-    const enrichedValue = point.enrichedValues[category];
-    // Attach enriched data to the DOM element for the tooltip to use
-    const element = document.querySelector(`[data-value="${value}"]`);
-    if (element) {
-      element.setAttribute(
-        'data-enriched',
-        JSON.stringify({
-          percentChange: enrichedValue.percentChange,
-          benchmark: enrichedValue.benchmark,
-          context: enrichedValue.context,
-        })
-      );
-    }
-    return formatValue(value, 'members');
-  };
+  // Current values for legend
+  const currentValues = useMemo(() => {
+    const latest = data[data.length - 1];
+    return categories.map(cat => ({
+      name: cat,
+      label: chartColors[cat].label,
+      value: latest[cat],
+      color: chartColors[cat].color,
+    }));
+  }, [data]);
 
   return (
-    <BaseChart
-      title="Community Growth Trends"
-      subtitle={`${formatValue(data[data.length - 1].total, 'members')} total members • ${metrics.total}% overall growth`}
-      accessibilityLabel="Member growth chart showing total, active, and new members over time"
-      rightContent={
-        <div className="flex items-center space-x-4">
-          <div
-            className="flex items-center space-x-2 text-white/70"
-            role="status"
-            aria-label="Selected time range"
-          >
-            <CalendarIcon className="w-5 h-5" aria-hidden="true" />
-            <span className="text-sm">{selectedRange}</span>
-          </div>
-          {metrics.total && Number(metrics.total) > 0 && (
-            <div
-              className="flex items-center space-x-2 px-2 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 text-sm"
-              role="status"
-              aria-label={`Growth rate: ${metrics.total}%`}
-            >
-              <ArrowTrendingUpIcon className="w-4 h-4" aria-hidden="true" />
-              <span>+{metrics.total}% Growth</span>
-            </div>
-          )}
-        </div>
-      }
-      insights={insights}
-      onInsightClick={handleInsightClick}
-      lastUpdated={lastUpdated}
-      chartId={chartId}
-      highlightedData={highlightedData}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay: 0.2 }}
+      className="h-full w-full flex flex-col"
     >
-      <div role="region" aria-label="Member growth chart" className="space-y-6">
-        {/* Key metrics summary */}
-        <div className="grid grid-cols-3 gap-4">
-          {Object.entries(metrics)
-            .filter(([key]) => key !== 'recentTrend')
-            .map(([key, value]) => (
+      <BaseChart
+        title="Member Growth"
+        subtitle="Track total, active, and new member trends"
+        accessibilityLabel="Area chart showing member growth trends"
+        rightContent={
+          <div className="flex items-center space-x-2">
+            <span className="mt-0.5 inline-flex rounded bg-emerald-100 px-1.5 py-0.5 text-tremor-label font-medium text-emerald-800 dark:bg-emerald-400/10 dark:text-emerald-400">
+              {metrics.total > 0 ? `+${metrics.total}%` : `${metrics.total}%`}
+            </span>
+          </div>
+        }
+        insights={insights}
+        onInsightClick={handleInsightClick}
+        chartId={chartId}
+        highlightedData={highlightedData}
+        className="h-full flex flex-col"
+      >
+        <div className="relative min-h-[300px] w-full">
+          {/* Legend */}
+          <div className="flex items-center gap-10 mb-4">
+            {currentValues.map(category => (
               <div
-                key={key}
-                className={`p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors ${
-                  highlightedData?.key === 'category' && highlightedData.value === key
-                    ? 'ring-2 ring-accent/50'
-                    : ''
-                }`}
+                key={category.name}
+                className="flex flex-col"
+                onClick={() => handleLegendClick(category.name as Category)}
+                role="button"
+                tabIndex={0}
               >
-                <div className="text-sm text-white/70">
-                  {categoryLabels[key as keyof typeof categoryLabels]}
+                <div className="flex items-center space-x-2">
+                  <span
+                    className={`w-2.5 h-2.5 rounded-sm bg-${category.color}-500`}
+                    aria-hidden={true}
+                  />
+                  <p className="text-tremor-label text-tremor-content-emphasis dark:text-dark-tremor-content-emphasis">
+                    {category.label}
+                  </p>
                 </div>
-                <div className="text-lg font-medium text-white">
-                  {formatValue(
-                    Number(value),
-                    key === 'total' ? 'members' : key === 'active' ? 'members' : 'growth'
-                  )}
-                </div>
-                {key !== 'new' && (
-                  <div className="text-sm text-white/50 mt-1">vs. previous period</div>
-                )}
+                <p className="text-tremor-title font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
+                  {formatValue(category.value, 'members')}
+                </p>
               </div>
             ))}
-        </div>
+          </div>
 
-        {/* Main chart */}
-        <div className="relative">
-          {highlightedPeriod === 'recent' && (
-            <div
-              className="absolute inset-0 bg-gradient-to-l from-accent/10 via-accent/5 to-transparent pointer-events-none z-10 transition-opacity duration-300"
-              style={{
-                clipPath: 'polygon(50% 0, 100% 0, 100% 100%, 50% 100%)',
-              }}
-            />
-          )}
           <AreaChart
-            data={enrichedData}
+            data={data}
             index="date"
             categories={visibleCategories}
-            colors={colors}
-            showLegend={true}
-            showGridLines={true}
-            startEndOnly={false}
-            showAnimation={hiddenSeries.length === 0}
-            className={`${chartStyles.areaChart.className} ${highlightTransitionStyles} ${
-              highlightedData?.key === 'category' || highlightedPeriod
-                ? '[&_.tremor-AreaChart-path]:transition-all [&_.tremor-AreaChart-path]:duration-300 [&_.tremor-AreaChart-path]:ease-in-out'
-                : ''
-            }`}
-            valueFormatter={formatChartValue}
-            onValueChange={v => {
-              setSelectedPoint(v ? String(v.date) : null);
-              if (!v) {
-                setHighlightedPeriod(null);
-                onHighlightChange?.(null);
-              }
-            }}
-            customTooltip={CustomTooltip}
-            yAxisWidth={56}
-            enableLegendSlider={false}
-            noDataText="No data available"
-            showYAxis={true}
+            colors={visibleCategories.map(cat => chartColors[cat].color)}
+            valueFormatter={value => formatValue(value, 'members')}
+            showAnimation={true}
+            showLegend={false}
+            showGridLines={false}
+            startEndOnly={true}
+            showGradient={true}
             showXAxis={true}
+            showYAxis={true}
+            yAxisWidth={56}
+            autoMinValue={true}
+            className="h-[300px] [&_.recharts-curve]:!stroke-2 [&_.recharts-curve[name='total']]:!stroke-[#06b6d4] [&_.recharts-curve[name='active']]:!stroke-[#10b981] [&_.recharts-curve[name='new']]:!stroke-[#8b5cf6] [&_.recharts-area[name='total']]:!fill-[rgba(6,182,212,0.2)] [&_.recharts-area[name='active']]:!fill-[rgba(16,185,129,0.2)] [&_.recharts-area[name='new']]:!fill-[rgba(139,92,246,0.2)]"
             curveType="monotone"
-            minValue={0}
-            aria-label="Interactive area chart showing member growth trends"
           />
+
+          {/* Highlight overlay */}
+          {highlightedPeriod && (
+            <div
+              className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-cyan-500/10 
+                          pointer-events-none transition-opacity duration-300"
+            />
+          )}
         </div>
-      </div>
-    </BaseChart>
+      </BaseChart>
+    </motion.div>
   );
 }

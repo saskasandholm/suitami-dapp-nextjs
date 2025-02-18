@@ -9,6 +9,24 @@
   --accent: #87fafd;
   --accent-light: rgba(135, 250, 253, 0.1);
   --accent-medium: rgba(135, 250, 253, 0.15);
+
+  /* Chart color variables */
+  --chart-messages: var(--accent);
+  --chart-reactions: #10b981;
+  --chart-threads: #8b5cf6;
+
+  /* Member Growth Chart colors */
+  --chart-total-stroke: #87fafd;
+  --chart-total-fill: rgba(135, 250, 253, 0.2);
+  --chart-active-stroke: #10b981;
+  --chart-active-fill: rgba(16, 185, 129, 0.2);
+  --chart-new-stroke: #8b5cf6;
+  --chart-new-fill: rgba(139, 92, 246, 0.2);
+
+  /* Sentiment chart colors */
+  --chart-positive: #10b981;
+  --chart-neutral: #64748b;
+  --chart-negative: #ef4444;
 }
 
 @layer base {
@@ -112,6 +130,96 @@
 .tremor-AreaChart-root,
 .tremor-BarChart-root {
   @apply text-white/70 !important;
+}
+
+/* Area Chart Specific Styles */
+.tremor-AreaChart-path {
+  @apply !stroke-2 transition-all duration-300 ease-in-out;
+}
+
+/* Chart axis and grid */
+.tremor-AreaChart-axis text {
+  fill: rgba(255, 255, 255, 0.7) !important;
+  font-size: 12px !important;
+}
+
+.tremor-AreaChart-grid line {
+  stroke: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Area Chart Colors */
+.tremor-AreaChart-path[data-key='total'] {
+  stroke: #06b6d4 !important;
+}
+
+.tremor-AreaChart-path[data-key='active'] {
+  stroke: #10b981 !important;
+}
+
+.tremor-AreaChart-path[data-key='new'] {
+  stroke: #8b5cf6 !important;
+}
+
+.tremor-AreaChart-area[data-key='total'] {
+  fill: rgba(6, 182, 212, 0.2) !important;
+}
+
+.tremor-AreaChart-area[data-key='active'] {
+  fill: rgba(16, 185, 129, 0.2) !important;
+}
+
+.tremor-AreaChart-area[data-key='new'] {
+  fill: rgba(139, 92, 246, 0.2) !important;
+}
+
+/* Hover states */
+.tremor-AreaChart-path:hover {
+  stroke-width: 3px !important;
+  filter: brightness(1.2) !important;
+}
+
+.tremor-AreaChart-area:hover {
+  fill-opacity: 0.8 !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+/* Chart Tooltip Styles */
+.tooltip {
+  @apply bg-black/95 backdrop-blur-sm border border-white/10 rounded-lg p-3 shadow-lg;
+}
+
+.tooltipDate {
+  @apply text-white/90 text-sm font-medium mb-2;
+}
+
+.tooltipRow {
+  @apply flex items-center justify-between gap-4 mb-1;
+}
+
+.tooltipLabel {
+  @apply flex items-center gap-2 text-white/70;
+}
+
+.tooltipDot {
+  @apply w-3 h-3 rounded-full;
+}
+
+.tooltipValue {
+  @apply text-white font-medium;
+}
+
+/* Chart Legend Styles */
+.legend-item {
+  @apply flex items-center space-x-2 text-sm text-white/70 hover:text-white transition-colors cursor-pointer;
+}
+
+.legend-dot {
+  @apply w-3 h-3 rounded-full transition-all hover:scale-110 hover:brightness-110;
+}
+
+/* Chart Highlight States */
+.highlight-overlay {
+  @apply absolute inset-0 bg-gradient-to-r from-accent/5 to-accent/10 pointer-events-none transition-opacity duration-300;
 }
 
 /* Tremor Chart Color Overrides */

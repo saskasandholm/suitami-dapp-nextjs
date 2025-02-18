@@ -80,6 +80,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added support for weekday/weekend variations
   - Enhanced event simulation capabilities
   - Added reproducible data generation with seeds
+- Enhanced HourlyActivityChart with three-layer color system:
+  - Layer 1: Base color definitions using CSS variables
+  - Layer 2: Bar colors and stroke styles
+  - Layer 3: Interactive states and animations
+  - Added peak hour indicator with improved visibility
+  - Enhanced tooltip and legend styling
+  - Improved grid and axis presentation
+  - Added selection and highlight states
+- Enhanced TrendingTopicsChart with component-scoped styling:
+  - Migrated to CSS Modules for better encapsulation
+  - Implemented consistent color system
+  - Added proper scrollbar styling
+  - Enhanced tooltip and badge presentation
+  - Improved related topics display
+  - Added proper type definitions
+  - Enhanced accessibility with ARIA labels
 
 ### Changed
 
@@ -129,6 +145,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Enhanced response structure with configurable data
   - Added detailed error messages for invalid configurations
   - Improved type safety in API responses
+- Refactored TrendingTopicsChart styling:
+  - Moved inline styles to CSS Module
+  - Implemented consistent color variables
+  - Enhanced visual feedback for interactions
+  - Improved component organization
+  - Added proper TypeScript types
+  - Standardized animation and transition effects
+- Refactored CurrentSentimentChart styling:
+  - Moved inline styles to CSS Module
+  - Implemented consistent color variables
+  - Enhanced visual feedback for interactions
+  - Improved component organization
+  - Added proper TypeScript types
+  - Standardized animation and transition effects
+- Refactored MemberGrowthChart to use Tremor's native color system:
+  - Removed custom CSS module and styling overrides
+  - Simplified color definitions to use Tremor's built-in colors
+  - Improved chart rendering consistency
+  - Enhanced performance by removing competing style systems
+  - Fixed chart colors appearing gray/muted
+  - Removed unnecessary style overrides from chartStyles.ts
+  - Cleaned up unused CSS variables and classes
+- Simplified chart styling system:
+  - Removed chartStyles.ts in favor of Tremor's native styling
+  - Removed custom style overrides from chart components
+  - Enhanced consistency by using Tremor's built-in design system
+  - Improved maintainability by reducing styling complexity
+  - Removed unnecessary style abstractions
+  - Fixed styling-related TypeScript errors
+- Enhanced chart styling system:
+  - Improved MemberGrowthChart color application with direct Recharts class targeting
+  - Updated area chart fill colors with proper opacity values
+  - Fixed gradient and stroke colors for better visibility
+  - Removed dependency on chartStyles.ts
+  - Simplified color system to use Tremor's native colors
+  - Added proper stroke width and color consistency
+  - Enhanced chart area opacity control
+  - Improved visual consistency across all charts
+
+### Removed
+
+- Deprecated chartStyles.ts system in favor of direct Tailwind CSS classes
+- Removed unused CSS variables and classes
+- Eliminated custom style overrides from chart components
 
 ### Fixed
 
@@ -167,6 +227,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Improved type safety in event handling
   - Fixed type mismatch between hourly and sentiment events
   - Enhanced code organization with clearer type naming
+- Fixed MemberGrowthChart color application:
+  - Added direct Recharts class overrides in globals.css
+  - Updated gradient definitions with correct opacity values
+  - Fixed gradient application to chart areas
+  - Improved stroke width and color consistency
+  - Enhanced chart area opacity control
+  - Added proper SVG gradient definitions
+- Fixed SentimentChart TypeScript errors:
+  - Resolved CustomTooltip naming conflict
+  - Added proper EventProps type import
+  - Improved component type safety
 
 ### Enhanced
 
@@ -1051,3 +1122,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Improved error handling for JSON parsing
   - Added validation for logical relationships between metrics
   - Enhanced API response format for validation errors
+
+## [Unreleased]
+
+### Enhanced
+
+- Improved MemberGrowthChart color scheme and gradients:
+  - Added custom gradient definitions for each data series
+  - Matched colors with theme accent colors
+  - Enhanced area fill opacity for better visibility
+  - Improved stroke width consistency
+  - Fixed color references throughout the component
+  - Added proper opacity transitions
